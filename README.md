@@ -8,5 +8,5 @@
 
 ## Dev
 * Make sure to re-do the step 4 above before coding. After dev, run `deactivate` to exit the virtual env.
-* Please create your own branch and only push your work to it instead of master.
-* Send pull request for code review before merging
+* Please create your own branch by running `git branch <yourname>` and run `git checkout <yourname>` before development. Commit and push your work by running `git push origin <yourname>` instead of master.
+* Send pull request for code review before merging.
