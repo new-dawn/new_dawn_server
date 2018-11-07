@@ -4,3 +4,5 @@ new_dawn/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+.idea/
+.DS_STORE
