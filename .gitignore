@@ -1,8 +1,8 @@
+.idea/
+.DS_STORE
 *.pyc
 new_dawn/
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-.idea/
-.DS_STORE
