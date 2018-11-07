@@ -5,6 +5,7 @@
 3. Run `virtualenv new_dawn` to create a virtual env
 4. Activate your virtual env by running `source new_dawn/bin/activate`
 5. Run `pip install -r requirements.txt` to install dependencies
+6. Add "127.0.0.1" to ALLOWED_HOSTS in new_dawn_server/settings.py
 
 ## Dev
 * Make sure to re-do the step 4 above before coding. After dev, run `deactivate` to exit the virtual env.
