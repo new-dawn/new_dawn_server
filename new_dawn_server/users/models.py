@@ -6,7 +6,6 @@ from django.db import models
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birthday = models.DateField()
-    nationality = models.CharField(max_length=40)
     creation_date = models.DateField(auto_now_add=True)
 
 # An account's profile information
