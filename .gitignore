@@ -1,3 +1,5 @@
+.idea/
+.DS_STORE
 *.pyc
 new_dawn/
 # Elastic Beanstalk Files
