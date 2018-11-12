@@ -1,15 +1,9 @@
-Babel==2.6.0
 Django==2.1.1
-<<<<<<< HEAD
 django-phonenumber-field==2.1.0
 phonenumbers==8.9.16
-pytz==2018.7
-requirements==0.1
-=======
 django-tastypie==0.14.2
 python-dateutil==2.7.5
 python-mimeparse==1.6.0
 pytz==2018.7
 PyYAML==3.13
 six==1.11.0
->>>>>>> 835bc4860864e1ba1ada9cc3d7ee62d6b5e46583
