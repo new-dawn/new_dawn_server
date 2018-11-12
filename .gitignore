@@ -1,6 +1,8 @@
 .idea/
 .DS_STORE
+__pycache__/
 *.pyc
+# Virtualenv
 new_dawn/
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
