@@ -4,6 +4,8 @@ python:
 install:
   - pip install -r requirements.txt
 before_script:
+  - cp db.sqlite3 db.sqlite3.copy
   - python manage.py migrate
 script:
+  - python pre_tests.py
   - python manage.py test 
