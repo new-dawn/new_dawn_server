@@ -22,12 +22,12 @@ class Profile(models.Model):
     )
     # city and hometown can later be changed to location library
     city_preference = models.CharField(max_length=50, blank=True)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
     employer = models.CharField(max_length=50, blank=True)
-    height = models.DecimalField(max_digits=2, decimal_places=2, blank=True)
+    height = models.DecimalField(decimal_places=2, max_digits=2, blank=True, null=True)
     hometown = models.CharField(max_length=50, blank=True)
     job_title = models.CharField(max_length=50, blank=True)
     profile_photo_url = models.CharField(max_length=1000)
     # school can be expanded further
     school = models.CharField(max_length=50, blank=True)
-    smoke = models.BooleanField(blank=True)
+    smoke = models.BooleanField(blank=True, null=True)
