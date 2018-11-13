@@ -1,4 +1,6 @@
 # New Dawn Server Repo
+[![Build Status](https://travis-ci.com/tangziyi001/new_dawn_server.svg?token=UWU238fD4jfedxeMH6HU&branch=master)](https://travis-ci.com/tangziyi001/new_dawn_server)
+
 ## Setup
 1. Clone the repo to your local machine by running `git clone https://github.com/tangziyi001/new_dawn_server.git`
 2. Download virtualenv
