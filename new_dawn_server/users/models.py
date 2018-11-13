@@ -15,11 +15,7 @@ class Account(models.Model):
 
 # An account's profile information
 class Profile(models.Model):
-    account = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='the user'
-    )
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
     # city and hometown can later be changed to location library
     city_preference = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=200)
