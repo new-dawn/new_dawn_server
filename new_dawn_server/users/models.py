@@ -27,3 +27,4 @@ class Profile(models.Model):
     # school can be expanded further
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
+   
