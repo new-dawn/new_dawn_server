@@ -9,7 +9,7 @@ class Account(models.Model):
     birthday = models.DateField()
     creation_date = models.DateField(auto_now_add=True)
     gender = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')), blank=True)
-    name = models.CharField(max_length=20,blank=True)
+    name = models.CharField(max_length=20, blank=True)
     phone_number = PhoneNumberField(blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -21,11 +21,10 @@ class Profile(models.Model):
     city_preference = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=200)
     employer = models.CharField(max_length=50, blank=True)
-    height = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True)
+    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     hometown = models.CharField(max_length=50, blank=True)
     job_title = models.CharField(max_length=50, blank=True)
     profile_photo_url = models.CharField(max_length=1000)
     # school can be expanded further
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
-   
