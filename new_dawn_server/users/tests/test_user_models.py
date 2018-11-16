@@ -21,6 +21,7 @@ class AccountTest(TestCase):
         self.assertEqual(test_user.birthday, datetime.date(1996, 1, 1))
     
     def test_account_phone_number(self):
+    	test_user = Account.objects.get(name="testuser")
         self.assertEqual(test_user.phone_number.as_international, "+1 400-400-4400")
         # TODO (ljl): Add more assertEqual to different form of output we can get
 
