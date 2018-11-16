@@ -9,6 +9,7 @@ class Account(models.Model):
     birthday = models.DateField()
     creation_date = models.DateField(auto_now_add=True)
     gender = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')), blank=True)
+    name = models.CharField(max_length=20,blank=True)
     phone_number = PhoneNumberField(blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
