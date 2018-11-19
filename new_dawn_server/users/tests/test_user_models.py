@@ -48,7 +48,6 @@ class ProfileTest(TestCase):
             height=Decimal(180.00),
             hometown="Chongqing",
             job_title="Analyst",
-            profile_photo_url="manman.com",
             school="NYU",
             smoke="True"
         )
@@ -69,7 +68,6 @@ class ProfileTest(TestCase):
         self.assertEqual(test_user_profile.employer, "ManMan")
         self.assertEqual(test_user_profile.hometown, "Chongqing")
         self.assertEqual(test_user_profile.job_title, "Analyst")
-        self.assertEqual(test_user_profile.profile_photo_url, "manman.com")
         self.assertEqual(test_user_profile.school, "NYU")
 
     def test_profile_decimal_fields(self):

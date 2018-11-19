@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from datetime import datetime
 
 # An account model
 class Account(models.Model):
@@ -13,6 +14,8 @@ class Account(models.Model):
     phone_number = PhoneNumberField(blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
 
 # An account's profile information
 class Profile(models.Model):
@@ -24,7 +27,17 @@ class Profile(models.Model):
     height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     hometown = models.CharField(max_length=50, blank=True)
     job_title = models.CharField(max_length=50, blank=True)
-    profile_photo_url = models.CharField(max_length=1000)
     # school can be expanded further
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
+    update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.account.name
+
+class Photo(models.Model):
+    user_account_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    photo_url = models.TextField(blank=True)
+    photo_description = models.CharField(max_length=200, blank=True)
+    date_added = models.DateField(auto_now_add=True)
+    is_valid = models.BooleanField(blank=True, null=True)
