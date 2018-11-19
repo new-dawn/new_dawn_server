@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from new_dawn_server.users.models import Account
-from new_dawn_server.user_actions.models import ActionsMetadata
+from new_dawn_server.actions.models import ActionsMetadata
 
 
 
