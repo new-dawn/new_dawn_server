@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'new_dawn_server',
     'new_dawn_server.users',
-    'new_dawn_server.user_actions',
+    'new_dawn_server.actions',
     'phonenumber_field',
     'tastypie',
 ]
