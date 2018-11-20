@@ -1,24 +1,26 @@
 from django.db import models
 
 
-class ActionsMetadata(models.Model):
-    user_account_from = models.ForeignKey("users.Account", on_delete=models.CASCADE, related_name="from_user")
-    user_account_to = models.ForeignKey("users.Account", on_delete=models.SET_NULL, related_name="to_user", null=True)
+class UserToUserActionMetadata(models.Model):
+    user_account_from = models.ForeignKey("users.Account", on_delete=models.CASCADE, related_name="from_user",
+                                          null=True, blank=True)
+    user_account_to = models.ForeignKey("users.Account", on_delete=models.SET_NULL, related_name="to_user", null=True,
+                                        blank=True)
     update_time = models.DateTimeField(auto_now_add=True)
 
 
 class Block(models.Model):
-    block_id = models.OneToOneField(ActionsMetadata, on_delete=models.CASCADE, primary_key=True)
+    block_metadata = models.OneToOneField(UserToUserActionMetadata, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class Like(models.Model):
-    like_id = models.OneToOneField(ActionsMetadata, on_delete=models.CASCADE, primary_key=True)
+    like_metadata = models.OneToOneField(UserToUserActionMetadata, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class Relationship(models.Model):
-    relationship_id = models.OneToOneField(ActionsMetadata, on_delete=models.CASCADE,
-                                           primary_key=True)
+    relationship_metadata = models.OneToOneField(UserToUserActionMetadata, on_delete=models.CASCADE, blank=True,
+                                                 null=True)
 
 
 class Match(models.Model):
-    match_id = models.OneToOneField(ActionsMetadata, on_delete=models.CASCADE, primary_key=True)
+    match_metadata = models.OneToOneField(UserToUserActionMetadata, on_delete=models.CASCADE, blank=True, null=True)

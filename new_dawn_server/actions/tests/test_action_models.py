@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from new_dawn_server.users.models import Account
-from new_dawn_server.actions.models import ActionsMetadata
+from new_dawn_server.actions.models import UserToUserActionMetadata
 
 
 
@@ -21,7 +21,7 @@ class LikeTest(TestCase):
             name="testuser_f",
             user=User.objects.create(username='nn')
         )
-        ActionsMetadata.objects.create(
+        UserToUserActionMetadata.objects.create(
             user_account_from=Account.objects.get(name="testuser_m"),
             user_account_to=Account.objects.get(name="testuser_f")
         )

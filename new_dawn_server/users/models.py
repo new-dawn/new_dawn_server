@@ -35,5 +35,5 @@ class Profile(models.Model):
     update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return self.account.name
+        return self.account.name + "_profile"
 
