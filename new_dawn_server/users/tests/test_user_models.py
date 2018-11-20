@@ -1,9 +1,9 @@
 import datetime
+from decimal import Decimal
 from django.contrib.auth.models import User
 from django.test import TestCase
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
-from decimal import Decimal
 
 
 class AccountTest(TestCase):
