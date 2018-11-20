@@ -4,7 +4,6 @@ from new_dawn_server.users.models import Account
 from new_dawn_server.actions.models import UserToUserActionMetadata
 
 
-
 class LikeTest(TestCase):
     def setUp(self):
         Account.objects.create(
@@ -25,4 +24,3 @@ class LikeTest(TestCase):
             user_account_from=Account.objects.get(name="testuser_m"),
             user_account_to=Account.objects.get(name="testuser_f")
         )
-
