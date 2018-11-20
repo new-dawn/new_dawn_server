@@ -5,7 +5,6 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-
 # An account model
 class Account(models.Model):
     birthday = models.DateField()
@@ -17,6 +16,7 @@ class Account(models.Model):
 
     def __str__(self):
         return self.name
+
 
 # An account's profile information
 class Profile(models.Model):
@@ -36,4 +36,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.account.name + "_profile"
-
