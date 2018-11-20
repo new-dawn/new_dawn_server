@@ -13,6 +13,9 @@ class Account(models.Model):
     phone_number = PhoneNumberField(blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 # An account's profile information
 class Profile(models.Model):
@@ -24,7 +27,11 @@ class Profile(models.Model):
     height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     hometown = models.CharField(max_length=50, blank=True)
     job_title = models.CharField(max_length=50, blank=True)
-    profile_photo_url = models.CharField(max_length=1000)
+    profile_photo_url = models.CharField(max_length=50, blank=True)
     # school can be expanded further
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
+    update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.account.name + "_profile"
