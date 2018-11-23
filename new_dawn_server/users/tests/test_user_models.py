@@ -33,12 +33,13 @@ class AccountTest(TestCase):
 
 class ProfileTest(TestCase):
     def setUp(self):
+        user = User.objects.create()
         Account.objects.create(
             birthday="1996-01-01",
             gender="M",
             phone_number="+14004004400",
             name="testuser",
-            user=User.objects.create()
+            user=user,
         )
         Profile.objects.create(
             account=Account.objects.get(name="testuser"),
@@ -50,7 +51,8 @@ class ProfileTest(TestCase):
             job_title="Analyst",
             profile_photo_url="manman.com",
             school="NYU",
-            smoke="True"
+            smoke="True",
+            user=user,
         )
 
     def test_profile_account_relationship(self):
