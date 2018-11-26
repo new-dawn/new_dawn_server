@@ -32,6 +32,7 @@ class Profile(models.Model):
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
     update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    answer_questions = models.ForeignKey("questions.AnswerQuestions", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.account.name + "_profile"
