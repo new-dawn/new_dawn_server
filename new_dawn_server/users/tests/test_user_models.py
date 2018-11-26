@@ -2,8 +2,8 @@ import datetime
 from decimal import Decimal
 from django.contrib.auth.models import User
 from django.test import TestCase
-from new_dawn_server.users.models import Account
-from new_dawn_server.users.models import Profile
+from new_dawn_server.questions.models import AnswerQuestions, Questions
+from new_dawn_server.users.models import Account, Profile
 
 
 class AccountTest(TestCase):
@@ -38,8 +38,19 @@ class ProfileTest(TestCase):
             gender="M",
             phone_number="+14004004400",
             name="testuser",
-            user=User.objects.create()
+            user=User.objects.create(username="101010")
         )
+        Questions.objects.create(
+            question="How are you doing?",
+            sample_answer="Very Good",
+        )
+        AnswerQuestions.objects.create(
+            answer="Good Good Good",
+            order=1,
+            question=Questions.objects.first(),
+            user=User.objects.get(username="101010")
+        )
+
         Profile.objects.create(
             account=Account.objects.get(name="testuser"),
             city_preference="New York",
@@ -50,7 +61,8 @@ class ProfileTest(TestCase):
             job_title="Analyst",
             profile_photo_url="manman.com",
             school="NYU",
-            smoke="True"
+            smoke="True",
+            answer_questions=AnswerQuestions.objects.first()
         )
 
     def test_profile_account_relationship(self):
@@ -61,7 +73,20 @@ class ProfileTest(TestCase):
         self.assertEqual(test_user_account.get_gender_display(), test_user_profile.account.get_gender_display())
         self.assertEqual(test_user_account.birthday, test_user_profile.account.birthday)
 
-    def test_profile_char_fileds(self):
+    def test_profile_answer_questions(self):
+        test_user_account = Account.objects.get(name="testuser")
+        test_user_profile = Profile.objects.get(account=test_user_account)
+        test_questions = test_user_profile.answer_questions
+        self.assertEqual(test_questions.question.question, "How are you doing?")
+        self.assertEqual(test_questions.order, 1)
+        self.assertEqual(test_questions.answer, "Good Good Good")
+
+    def test_profile_boolean_fields(self):
+        test_user_account = Account.objects.get(name="testuser")
+        test_user_profile = Profile.objects.get(account=test_user_account)
+        self.assertEqual(test_user_profile.smoke, True)
+
+    def test_profile_char_fields(self):
         test_user_account = Account.objects.get(name="testuser")
         test_user_profile = Profile.objects.get(account=test_user_account)
         self.assertEqual(test_user_profile.city_preference, "New York")
@@ -76,8 +101,3 @@ class ProfileTest(TestCase):
         test_user_account = Account.objects.get(name="testuser")
         test_user_profile = Profile.objects.get(account=test_user_account)
         self.assertEqual(test_user_profile.height, 180.00)
-
-    def test_profile_boolean_fields(self):
-        test_user_account = Account.objects.get(name="testuser")
-        test_user_profile = Profile.objects.get(account=test_user_account)
-        self.assertEqual(test_user_profile.smoke, True)
