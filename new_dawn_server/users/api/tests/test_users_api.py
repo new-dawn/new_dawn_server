@@ -21,9 +21,14 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "gender": "M",
         }
         self.profile_arguments = {
+            "city_preference": "New York",
+            "description": "nice",
+            "employer": "MANMAN",
+            "hometown": "NY",
             "job_title": "CEO",
+            "profile_photo_url": "www",
+            "school": "NYU",
             "smoke": True,
-            "gender": "M",
         }
     
     def test_register_fail_missing_fields(self):

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.db import transaction
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
@@ -12,7 +13,7 @@ from tastypie.validation import Validation
 
 # Fields of each user-related model
 # The bool value means if the field is required 
-# during initial registration
+# during INITIAL registration
 
 USER_FIELDS = {
 	"username": True,
@@ -38,6 +39,9 @@ PROFILE_FIELDS = {
 	"school": False,
 	"smoke": False,
 }
+
+# Account Name Delimiter
+ACCOUNT_NAME_DELIMITER = "_"
 
 
 class UserResource(ModelResource):
@@ -104,13 +108,23 @@ class UserRegisterResource(ModelResource):
 		print(result_dict)
 		return result_dict
 
+	@staticmethod
+	def _get_account_name(first_name, last_name):
+		return first_name + ACCOUNT_NAME_DELIMITER + last_name
+
 	def obj_create(self, bundle, **kwargs):
-		try:
+		"""
+		Override obj_create method to create related models
+		"""
+		# Either all models are successfully created or no model is created
+		# TODO: Catch exception with Django Logging
+		with transaction.atomic():
 			user_bundle = super(UserRegisterResource, self).obj_create(bundle, **kwargs)
 			user_bundle.obj.set_password(bundle.data.get("password"))
 			user_bundle.obj.save()
 			account = Account(
 				user=user_bundle.obj,
+				name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
 				**self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
 			)
 			account.save()
@@ -120,10 +134,4 @@ class UserRegisterResource(ModelResource):
 				**self._get_model_fields_dict(bundle, PROFILE_FIELDS)
 			)
 			profile.save()
-		except IntegrityError:
-			raise BadRequest("Username already exists")
 		return bundle
-
-
-
-
