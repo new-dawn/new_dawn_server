@@ -105,7 +105,6 @@ class UserRegisterResource(ModelResource):
 		for field, _ in fields.items():
 			# The field can be None if it's not in the bundle
 			result_dict[field] = bundle.data.get(field)
-		print(result_dict)
 		return result_dict
 
 	@staticmethod

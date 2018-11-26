@@ -48,11 +48,8 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments, 
             **self.profile_arguments
         }
-        res = self.api_client.post("/api/v1/register/",
-        format="json", data=all_arguments)
-        print([getattr(res, k) for k in dir(res)])
-        # self.assertHttpCreated(self.api_client.post("/api/v1/register/",
-        # format="json", data=all_arguments))
+        self.assertHttpCreated(self.api_client.post("/api/v1/register/",
+        format="json", data=all_arguments))
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)

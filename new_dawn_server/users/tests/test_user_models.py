@@ -63,7 +63,7 @@ class ProfileTest(TestCase):
             profile_photo_url="manman.com",
             school="NYU",
             smoke="True",
-            answer_questions=AnswerQuestions.objects.first()
+            answer_questions=AnswerQuestions.objects.first(),
             user=User.objects.get(username="101010")
         )
 
