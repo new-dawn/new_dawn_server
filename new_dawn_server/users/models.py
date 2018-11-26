@@ -20,9 +20,10 @@ class Account(models.Model):
 # An account's profile information
 class Profile(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    answer_questions = models.ForeignKey("questions.AnswerQuestions", on_delete=models.SET_NULL, null=True)
     # city and hometown can later be changed to location library
     city_preference = models.CharField(max_length=50, blank=True)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
     employer = models.CharField(max_length=50, blank=True)
     height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     hometown = models.CharField(max_length=50, blank=True)
@@ -32,7 +33,7 @@ class Profile(models.Model):
     school = models.CharField(max_length=50, blank=True)
     smoke = models.BooleanField(blank=True, null=True)
     update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    answer_questions = models.ForeignKey("questions.AnswerQuestions", on_delete=models.SET_NULL, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.account.name + "_profile"
