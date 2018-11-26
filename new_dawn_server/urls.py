@@ -15,12 +15,16 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-
+from new_dawn_server.users.api.resources import (
+    AccountResource,
+    UserRegisterResource,
+    UserResource,
+)
 from tastypie.api import Api
-from new_dawn_server.api.resources import AccountResource, UserResource
 
 # Tastypie API v1 Register
 v1_api = Api(api_name='v1')
+v1_api.register(UserRegisterResource())
 v1_api.register(UserResource())
 v1_api.register(AccountResource())
 

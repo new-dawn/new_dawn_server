@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'new_dawn_server',
+    'new_dawn_server.actions',
     'new_dawn_server.users',
     'phonenumber_field',
     'tastypie',
