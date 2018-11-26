@@ -20,6 +20,7 @@ class Account(models.Model):
 # An account's profile information
 class Profile(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    answer_questions = models.ForeignKey("questions.AnswerQuestions", on_delete=models.SET_NULL, null=True)
     # city and hometown can later be changed to location library
     city_preference = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=200, blank=True)
