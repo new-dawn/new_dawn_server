@@ -4,7 +4,7 @@ from django.db import models
 
 class Questions(models.Model):
     question = models.CharField(max_length=150)
-    sample_answer = models.CharField(max_length=150, blank=True, null=True)
+    sample_answer = models.CharField(blank=True, max_length=150, null=True)
 
 
 class AnswerQuestions(models.Model):
