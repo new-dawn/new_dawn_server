@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 from django.contrib.auth.models import User
 from django.test import TestCase
-from new_dawn_server.questions.models import AnswerQuestions, Questions
+from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account, Profile
 
 
@@ -33,7 +33,6 @@ class AccountTest(TestCase):
 
 class ProfileTest(TestCase):
     def setUp(self):
-        user = User.objects.create()
         Account.objects.create(
             birthday="1996-01-01",
             gender="M",
@@ -41,14 +40,14 @@ class ProfileTest(TestCase):
             name="testuser",
             user=User.objects.create(username="101010")
         )
-        Questions.objects.create(
+        Question.objects.create(
             question="How are you doing?",
             sample_answer="Very Good",
         )
-        AnswerQuestions.objects.create(
+        AnswerQuestion.objects.create(
             answer="Good Good Good",
             order=1,
-            question=Questions.objects.first(),
+            question=Question.objects.first(),
             user=User.objects.get(username="101010")
         )
 
@@ -63,7 +62,7 @@ class ProfileTest(TestCase):
             profile_photo_url="manman.com",
             school="NYU",
             smoke="True",
-            answer_questions=AnswerQuestions.objects.first(),
+            answer_questions=AnswerQuestion.objects.first(),
             user=User.objects.get(username="101010")
         )
 
