@@ -13,9 +13,16 @@
 2. In another terminal session, use `curl` to GET/POST your request.
 
 ### Example
-* Registration: `curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang"}' http://localhost:8000/api/v1/register/`. You should get an error message from server since the required fields are missing. Fill in required fields will let you successfully register a user:
+* Registration
 ```
-TZY-Mac:new_dawn_server Tang$ curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang", "birthday": "1800-01-01", "password": "manman", "phone_number": "+11111111111", "username": "goodman", "gender": "M"}' http://localhost:8000/api/v1/register/
+`curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang"}' http://localhost:8000/api/v1/register/`
+``` 
+You should get an error message from server since the required fields are missing. Fill in required fields will let you successfully register a user:
+```
+curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang", "birthday": "1800-01-01", "password": "manman", "phone_number": "+11111111111", "username": "goodman", "gender": "M"}' http://localhost:8000/api/v1/register/
+```
+Then you should see a success message:
+```
 HTTP/1.1 201 Created
 Date: Wed, 28 Nov 2018 02:34:48 GMT
 Server: WSGIServer/0.2 CPython/3.6.7
@@ -26,6 +33,7 @@ X-Frame-Options: SAMEORIGIN
 Content-Length: 0
 ```
 Feel free to play with different invalid input to see how the server returns error message.
+Except for required fields, there are some optional fields that you can lookup from `users/api/resources.py`
 
 ## Dev Basic
 * Make sure to re-do the step 4 above before coding. After dev, run `deactivate` to exit the virtual env.
