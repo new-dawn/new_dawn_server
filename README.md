@@ -15,7 +15,7 @@
 ### Example
 * Registration
 ```
-`curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang"}' http://localhost:8000/api/v1/register/`
+curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first_name": "ziyi", "last_name": "tang"}' http://localhost:8000/api/v1/register/
 ``` 
 You should get an error message from server since the required fields are missing. Fill in required fields will let you successfully register a user:
 ```
