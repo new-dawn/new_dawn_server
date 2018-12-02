@@ -6,11 +6,11 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 # An account model
 class Account(models.Model):
-    birthday = models.DateField()
+    birthday = models.DateField(blank=True, null=True)
     creation_date = models.DateField(auto_now_add=True)
-    gender = models.CharField(choices=(('M', 'Male'), ('F', 'Female')), max_length=1)
+    gender = models.CharField(blank=True, choices=(('M', 'Male'), ('F', 'Female')), max_length=1, null=True)
     name = models.CharField(blank=True, max_length=20, null=True)
-    phone_number = PhoneNumberField()
+    phone_number = PhoneNumberField(blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
