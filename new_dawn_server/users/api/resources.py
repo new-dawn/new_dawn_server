@@ -23,9 +23,9 @@ USER_FIELDS = {
 }
 
 ACCOUNT_FIELDS = {
-	"birthday": True,
-	"gender": True,
-	"phone_number": True,
+	"birthday": False,
+	"gender": False,
+	"phone_number": False,
 }
 
 PROFILE_FIELDS = {
