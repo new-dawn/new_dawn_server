@@ -6,6 +6,7 @@ from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie.test import ResourceTestCaseMixin
 
+
 class UserRegisterTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
         super().setUp()
@@ -30,26 +31,18 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "school": "NYU",
             "smoke": True,
         }
-    
-    def test_register_fail_missing_fields(self):
-        self.assertEqual(User.objects.count(), 0)
-        self.assertEqual(Account.objects.count(), 0)
-        self.assertEqual(Profile.objects.count(), 0)
-        self.assertHttpBadRequest(self.api_client.post("/api/v1/register/",
-        format="json", data=self.register_arguments))
-        self.assertEqual(User.objects.count(), 0)
 
     def test_register_success(self):
         self.assertEqual(User.objects.count(), 0)
         self.assertEqual(Account.objects.count(), 0)
         self.assertEqual(Profile.objects.count(), 0)
         all_arguments = {
-            **self.register_arguments, 
-            **self.account_arguments, 
+            **self.register_arguments,
+            **self.account_arguments,
             **self.profile_arguments
         }
         self.assertHttpCreated(self.api_client.post("/api/v1/register/",
-        format="json", data=all_arguments))
+                                                    format="json", data=all_arguments))
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)
@@ -60,20 +53,19 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         user = User.objects.get(username="test-user")
         for k, v in self.register_arguments.items():
             if k == "password":
-                self.assertTrue(check_password(v, getattr(user, k))) 
+                self.assertTrue(check_password(v, getattr(user, k)))
             else:
-                self.assertEqual(getattr(user, k), v) 
+                self.assertEqual(getattr(user, k), v)
 
-        # Verify Account fields are populated
+                # Verify Account fields are populated
         account = Account.objects.get(user=user)
         for k, v in self.account_arguments.items():
             if k == "birthday":
-                self.assertEqual(getattr(account, k).strftime("%Y-%m-%d"), v) 
+                self.assertEqual(getattr(account, k).strftime("%Y-%m-%d"), v)
             else:
-                self.assertEqual(getattr(account, k), v) 
-        
-        # Verify Profile fields are populated
+                self.assertEqual(getattr(account, k), v)
+
+                # Verify Profile fields are populated
         profile = Profile.objects.get(user=user)
         for k, v in self.profile_arguments.items():
-            self.assertEqual(getattr(profile, k), v) 
-
+            self.assertEqual(getattr(profile, k), v)
