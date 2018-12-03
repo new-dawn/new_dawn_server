@@ -24,13 +24,15 @@ curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"first
 Then you should see a success message:
 ```
 HTTP/1.1 201 Created
-Date: Wed, 28 Nov 2018 02:34:48 GMT
+Date: Mon, 03 Dec 2018 03:33:22 GMT
 Server: WSGIServer/0.2 CPython/3.6.7
-Content-Type: text/html; charset=utf-8
-Location: /api/v1/register/1/
+Content-Type: application/json
+Location: /api/v1/register/7/
 Vary: Accept
 X-Frame-Options: SAMEORIGIN
-Content-Length: 0
+Content-Length: 381
+
+{"birthday": "1800-01-01", "date_joined": "2018-12-02T22:33:22.203670", "email": "", "first_name": "ziyi", "gender": "M", "id": 7, "is_active": true, "is_staff": false, "is_superuser": false, "last_login": null, "last_name": "tang", "password": "pbkdf2_sha256$120000$EZGzO2YmhkK6$jgsvSXMXV41gyEVDsWQAgxkn/sT0W+xnZvMYUkNY8DA=", "phone_number": "+11111111111", "username": "goodman"}
 ```
 Feel free to play with different invalid input to see how the server returns error message.
 Except for required fields, there are some optional fields that you can lookup from `users/api/resources.py`
