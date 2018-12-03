@@ -92,6 +92,7 @@ class UserRegisterValidation(Validation):
 class UserRegisterResource(ModelResource):
 	class Meta:
 		allowed_methods = ["post"]
+		always_return_data = True
 		authentication = Authentication()
 		authorization = Authorization()
 		include_resource_uri = False
