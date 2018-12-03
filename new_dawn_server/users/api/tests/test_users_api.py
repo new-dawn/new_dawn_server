@@ -1,7 +1,9 @@
+import datetime
+import json
+
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
-import datetime
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie.test import ResourceTestCaseMixin
@@ -41,8 +43,15 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
-        self.assertHttpCreated(self.api_client.post("/api/v1/register/",
-                                                    format="json", data=all_arguments))
+        res = self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        for k, v in all_arguments.items():
+            self.assertTrue(k in res_data)
+            if k == "password":
+                self.assertTrue(check_password(v, res_data[k]))
+            else:
+                self.assertEqual(v, res_data[k])
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)
