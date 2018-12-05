@@ -5,12 +5,12 @@ from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 
 ANSWER_QUESTION_FIELDS = {
-    "answer": False,
+    "answer": True,
     "order": False,
 }
 
 QUESTION_FIELDS = {
-    "question": False,
+    "question": True,
     "sample_answer": False,
 }
 
