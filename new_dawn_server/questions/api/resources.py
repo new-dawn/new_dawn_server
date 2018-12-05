@@ -5,13 +5,13 @@ from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 
 ANSWER_QUESTION_FIELDS = {
-    "answer": True,
-    "order": True,
+    "answer": False,
+    "order": False,
 }
 
 QUESTION_FIELDS = {
-    "question": True,
-    "sample_answer": True,
+    "question": False,
+    "sample_answer": False,
 }
 
 
@@ -25,15 +25,15 @@ class QuestionResource(ModelResource):
 
 
 class AnswerQuestionResource(ModelResource):
-    question = fields.ForeignKey(QuestionResource, "question", related_name="answerquestion", full=True)
-    user = fields.ForeignKey(UserResource, "user", related_name="answerquestion", full=True)
+    question = fields.ForeignKey(QuestionResource, "question", related_name="answer_question", full=True)
+    user = fields.ForeignKey(UserResource, "user", related_name="answer_question", full=True)
 
     class Meta:
         always_return_data = True
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         queryset = AnswerQuestion.objects.all()
-        resource_name = "answerquestion"
+        resource_name = "answer_question"
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'question': ALL_WITH_RELATIONS,

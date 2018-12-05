@@ -22,7 +22,6 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             "last_name": "user",
             "username": "test-user",
             "password": "test-pwd",
-
         }
         self.api_client.post(
             "/api/v1/register/", format="json", data=self.register_argument)
@@ -63,11 +62,8 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
         self.api_client.post(
             "/api/v1/question/", format="json", data=self.question_argument)
 
-        self.api_client.post(
-            "/api/v1/user/", format="json", data=self.register_argument)
-
         res = self.api_client.post(
-            "/api/v1/answerquestion/", format="json", data=all_arguments)
+            "/api/v1/answer_question/", format="json", data=all_arguments)
         res_data = json.loads(res.content)
 
         for k, v in all_arguments.items():
@@ -94,12 +90,9 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/question/", format="json", data=self.question_argument)
 
         self.api_client.post(
-            "/api/v1/user/", format="json", data=self.register_argument)
+            "/api/v1/answer_question/", format="json", data=all_arguments)
 
-        self.api_client.post(
-            "/api/v1/answerquestion/", format="json", data=all_arguments)
-
-        res = self.api_client.get("/api/v1/answerquestion/", format="json")
+        res = self.api_client.get("/api/v1/answer_question/", format="json")
         res_data = json.loads(res.content)
 
         # Verify Data were posted and getted correctly
