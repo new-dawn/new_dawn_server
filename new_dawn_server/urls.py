@@ -15,6 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from new_dawn_server.questions.api.resources import (
+    AnswerQuestionResource,
+    QuestionResource
+)
 from new_dawn_server.users.api.resources import (
     AccountResource,
     UserRegisterResource,
@@ -27,6 +31,8 @@ v1_api = Api(api_name='v1')
 v1_api.register(UserRegisterResource())
 v1_api.register(UserResource())
 v1_api.register(AccountResource())
+v1_api.register(QuestionResource())
+v1_api.register(AnswerQuestionResource())
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
