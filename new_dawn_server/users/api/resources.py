@@ -55,7 +55,6 @@ ACCOUNT_NAME_DELIMITER = "_"
 
 
 class UserResource(ModelResource):
-    
     class Meta:
         allowed_methods = ["get", "post"]
         authentication = Authentication()
@@ -105,7 +104,6 @@ class UserResource(ModelResource):
             return self.create_response(request, { "success": True })
         else:
             return self.create_response(request, { "success": False }, HttpUnauthorized)
-
 
 
 class AccountResource(ModelResource):
@@ -194,4 +192,3 @@ class UserRegisterResource(ModelResource):
         bundle.data["username"] = bundle.obj.username
         bundle.data["token"] = bundle.obj.api_key.key
         return bundle
-
