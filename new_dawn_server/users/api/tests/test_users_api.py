@@ -45,13 +45,11 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         }
         res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
+
+        user = User.objects.get(username="test-user")
         res_data = json.loads(res.content)
-        for k, v in all_arguments.items():
-            self.assertTrue(k in res_data)
-            if k == "password":
-                self.assertTrue(check_password(v, res_data[k]))
-            else:
-                self.assertEqual(v, res_data[k])
+        res_data["username"] = self.register_arguments["username"]
+        res_data["token"] = user.api_key.key
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)
@@ -59,14 +57,13 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(Profile.objects.count(), 1)
 
         # Verify User fields are populated
-        user = User.objects.get(username="test-user")
         for k, v in self.register_arguments.items():
             if k == "password":
                 self.assertTrue(check_password(v, getattr(user, k)))
             else:
                 self.assertEqual(getattr(user, k), v)
 
-                # Verify Account fields are populated
+        # Verify Account fields are populated
         account = Account.objects.get(user=user)
         for k, v in self.account_arguments.items():
             if k == "birthday":
@@ -78,3 +75,29 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         profile = Profile.objects.get(user=user)
         for k, v in self.profile_arguments.items():
             self.assertEqual(getattr(profile, k), v)
+
+    def test_login_success(self):
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        login_arguments = {
+            "username": self.register_arguments["username"],
+            "password": self.register_arguments["password"],
+        }
+
+        # Register a new account
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+
+        # Check login success
+        res = self.api_client.post(
+            "/api/v1/user/login/", format="json", data=login_arguments)
+
+        # Return success message and api-key
+        res_data = json.loads(res.content)
+        user = User.objects.get(username="test-user")
+        self.assertEqual(res_data["success"], True)
+        self.assertEqual(res_data["token"], user.api_key.key)
+
