@@ -70,11 +70,13 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             self.assertTrue(k in res_data)
             # Already tested user and question
             if k == "user":
-                no_password_args = self.register_argument
-                no_password_args.pop("password", None)
-                self.assertTrue(no_password_args.items() < res_data["user"].items())
+                for k1, v1 in self.register_argument.items():
+                    if k1 == "password":
+                        continue
+                    self.assertEqual(v1, res_data["user"][k1])
             elif k == "question":
-                self.assertTrue(self.question_argument.items() < res_data["question"].items())
+                for k1, v1 in self.question_argument.items():
+                    self.assertEqual(v1, res_data["question"][k1])
             else:
                 self.assertEqual(v, res_data[k])
 
