@@ -101,3 +101,16 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(res_data["success"], True)
         self.assertEqual(res_data["token"], user.api_key.key)
 
+    def test_user_profile_get(self):
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+
+        res = self.api_client.get("/api/v1/profile/", format="json", data={"username": "test-user"})
+        res_data = json.loads(res.content)
+        for k, v in self.profile_arguments.items():
+            self.assertEqual(res_data['objects'][0][k], v)

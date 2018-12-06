@@ -23,6 +23,7 @@ from new_dawn_server.users.api.resources import (
     AccountResource,
     UserRegisterResource,
     UserResource,
+    ProfileResource,
 )
 from tastypie.api import Api
 
@@ -33,6 +34,7 @@ v1_api.register(UserResource())
 v1_api.register(AccountResource())
 v1_api.register(QuestionResource())
 v1_api.register(AnswerQuestionResource())
+v1_api.register(ProfileResource())
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
