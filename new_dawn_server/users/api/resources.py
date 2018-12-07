@@ -82,8 +82,10 @@ class UserResource(ModelResource):
         if user:
             if user.is_active:
                 login(request, user)
+                # Return username and access token to store in iOS keychain
                 return self.create_response(request, {
                     "success": True,
+                    "username": user.username,
                     "token": user.api_key.key,
                 })
             else:

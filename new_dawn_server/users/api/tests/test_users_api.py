@@ -99,5 +99,6 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         res_data = json.loads(res.content)
         user = User.objects.get(username="test-user")
         self.assertEqual(res_data["success"], True)
+        self.assertEqual(res_data["username"], self.register_arguments["username"])
         self.assertEqual(res_data["token"], user.api_key.key)
 
