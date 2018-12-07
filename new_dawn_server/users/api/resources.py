@@ -90,20 +90,20 @@ class UserResource(ModelResource):
                 return self.create_response(request, {
                     "success": False,
                     "reason": "disabled",
-                }, HttpForbidden )
+                }, HttpForbidden)
         else:
             return self.create_response(request, {
                 "success": False,
                 "reason": "incorrect",
-                }, HttpUnauthorized )
+            }, HttpUnauthorized)
 
     def logout(self, request, **kwargs):
         self.method_check(request, allowed=["get"])
         if request.user and request.user.is_authenticated():
             logout(request)
-            return self.create_response(request, { "success": True })
+            return self.create_response(request, {"success": True})
         else:
-            return self.create_response(request, { "success": False }, HttpUnauthorized)
+            return self.create_response(request, {"success": False}, HttpUnauthorized)
 
 
 class AccountResource(ModelResource):
@@ -118,7 +118,7 @@ class AccountResource(ModelResource):
 
 
 class ProfileResource(ModelResource):
-    account = fields.ToOneField(UserResource, "account", related_name="profile", full=True)
+    account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
 
     class Meta:
