@@ -134,6 +134,7 @@ class ProfileResource(ModelResource):
         queryset = Profile.objects.all()
         resource_name = "profile"
 
+
 class UserRegisterValidation(Validation):
     def is_valid(self, bundle, request=None):
         if not bundle.data:
