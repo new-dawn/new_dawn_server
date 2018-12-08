@@ -7,7 +7,7 @@ from django.db.models import signals
 import logging
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
-from new_dawn_server.questions.models import AnswerQuestion, Question
+from new_dawn_server.questions.models import AnswerQuestion
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
