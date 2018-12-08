@@ -62,6 +62,7 @@ class UserResource(ModelResource):
         authentication = Authentication()
         authorization = Authorization()
         excludes = ["is_staff", "password"]
+        filtering = {"username": "exact"}
         queryset = User.objects.all()
         resource_name = "user"
 

@@ -116,6 +116,20 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
+    def test_user_profile_get_with_filtering(self):
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+
+        res = self.api_client.get("/api/v1/profile/?user__username=test-user", format="json")
+        res_data = json.loads(res.content)
+        for k, v in self.profile_arguments.items():
+            self.assertEqual(res_data['objects'][0][k], v)
+
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
@@ -153,7 +167,6 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
             "question": "Good good?",
             "sample_answer": "good good",
         }
-
         all_arguments = {
             **self.register_arguments,
             **self.account_arguments,
@@ -171,14 +184,14 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def test_get_all_profiles_questions(self):
 
         for i in range(1, 4):
-            all_arguments = {
+            one_time_arguments = {
                 "order": i,
                 "answer": "niu",
                 "user": "/api/v1/user/1/",
                 "question": f"/api/v1/question/{i}/",
             }
             self.api_client.post(
-                "/api/v1/answer_question/", format="json", data=all_arguments
+                "/api/v1/answer_question/", format="json", data=one_time_arguments
             )
         res = self.api_client.get("/api/v1/profile/", format="json")
         res_data = json.loads(res.content)
