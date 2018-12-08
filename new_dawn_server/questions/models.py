@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from new_dawn_server.users.models import Profile
 
 
 class Question(models.Model):
@@ -10,6 +11,7 @@ class Question(models.Model):
 class AnswerQuestion(models.Model):
     answer = models.CharField(max_length=150)
     order = models.IntegerField(blank=True, null=True)
+    user_profile = models.ForeignKey(Profile, blank=True, null=True, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     update_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

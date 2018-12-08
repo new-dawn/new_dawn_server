@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
+from new_dawn_server.questions.api.resources import AnswerQuestionResource
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
@@ -122,6 +123,7 @@ class AccountResource(ModelResource):
 class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
+    answer_question = fields.ToOneField(AnswerQuestionResource, "answer_question", related_name="profile", full=True)
 
     class Meta:
         allowed_methods = ["get"]
