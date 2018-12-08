@@ -29,12 +29,12 @@ from tastypie.api import Api
 
 # Tastypie API v1 Register
 v1_api = Api(api_name='v1')
-v1_api.register(UserRegisterResource())
-v1_api.register(UserResource())
 v1_api.register(AccountResource())
-v1_api.register(QuestionResource())
 v1_api.register(AnswerQuestionResource())
 v1_api.register(ProfileResource())
+v1_api.register(QuestionResource())
+v1_api.register(UserRegisterResource())
+v1_api.register(UserResource())
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
