@@ -4,9 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
+from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
-from new_dawn_server.questions.models import AnswerQuestion
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
