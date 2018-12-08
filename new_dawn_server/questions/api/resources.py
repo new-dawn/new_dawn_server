@@ -1,5 +1,5 @@
 from new_dawn_server.questions.models import AnswerQuestion, Question
-from new_dawn_server.users.api.resources import ProfileResource, UserResource
+from new_dawn_server.users.api.resources import UserResource
 from tastypie import fields
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
@@ -27,7 +27,6 @@ class QuestionResource(ModelResource):
 class AnswerQuestionResource(ModelResource):
     question = fields.ForeignKey(QuestionResource, "question", related_name="answer_question", full=True)
     user = fields.ForeignKey(UserResource, "user", related_name="answer_question", full=True)
-    user_profile = fields.ForeignKey(ProfileResource, "user_profile", related_name="answer_question", full=True)
 
     class Meta:
         always_return_data = True
@@ -38,5 +37,4 @@ class AnswerQuestionResource(ModelResource):
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'question': ALL_WITH_RELATIONS,
-            'user_profile': ALL_WITH_RELATIONS,
         }

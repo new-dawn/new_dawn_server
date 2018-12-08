@@ -4,16 +4,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
+import logging
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
-from new_dawn_server.questions.api.resources import AnswerQuestionResource
+from new_dawn_server.questions.models import AnswerQuestion, Question
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpUnauthorized, HttpForbidden
 from tastypie.models import create_api_key
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 from tastypie.validation import Validation
 
@@ -123,14 +124,37 @@ class AccountResource(ModelResource):
 class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
-    answer_question = fields.ToOneField(AnswerQuestionResource, "answer_question", related_name="profile", full=True)
 
     class Meta:
         allowed_methods = ["get"]
         authentication = Authentication()
         authorization = Authorization()
+        filtering = {
+            'user': ALL_WITH_RELATIONS
+        }
         queryset = Profile.objects.all()
         resource_name = "profile"
+
+    @staticmethod
+    def _get_all_questions_answers(answer_question_obj):
+        result_list = []
+        for answer_question in answer_question_obj:
+            one_question_answer_dict = {
+                'question': answer_question.question.question,
+                'answer': answer_question.answer,
+                'order': answer_question.order,
+                "update_time": answer_question.update_time,
+            }
+            result_list.append(one_question_answer_dict)
+        return result_list
+
+    # Add Answer question fields in Profile Resource
+    def dehydrate(self, bundle):
+        user_id = bundle.data['user'].data['id']
+        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
+        answer_question_lists = self._get_all_questions_answers(answer_question_obj)
+        bundle.data['answer_question'] = answer_question_lists
+        return bundle
 
 
 class UserRegisterValidation(Validation):
