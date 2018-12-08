@@ -130,4 +130,77 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
-        
+
+class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.register_arguments = {
+            "first_name": "test",
+            "last_name": "user",
+            "username": "test-user",
+            "password": "test-pwd",
+        }
+        self.account_arguments = {
+            "birthday": "1990-01-01",
+            "phone_number": "+12345678900",
+            "gender": "M",
+        }
+        self.profile_arguments = {
+            "city_preference": "New York",
+            "description": "nice",
+            "employer": "MANMAN",
+            "hometown": "NY",
+            "job_title": "CEO",
+            "profile_photo_url": "www",
+            "school": "NYU",
+            "smoke": True,
+        }
+        self.question_argument_1 = {
+            "question": "How are you doing?",
+            "sample_answer": "Pretty Good",
+        }
+        self.question_argument_2 = {
+            "question": "Good?",
+            "sample_answer": "Good",
+        }
+        self.question_argument_3 = {
+            "question": "Good good?",
+            "sample_answer": "good good",
+        }
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+        self.api_client.post(
+            "/api/v1/question/", format="json", data=self.question_argument_1)
+        self.api_client.post(
+            "/api/v1/question/", format="json", data=self.question_argument_2)
+        self.api_client.post(
+            "/api/v1/question/", format="json", data=self.question_argument_3)
+
+    def test_get_all_profiles_questions(self):
+
+        for i in range(1, 4):
+            one_time_arguments = {
+                "order": i,
+                "answer": "niu",
+                "user": "/api/v1/user/1/",
+                "question": f"/api/v1/question/{i}/",
+            }
+            self.api_client.post(
+                "/api/v1/answer_question/", format="json", data=one_time_arguments
+            )
+        res = self.api_client.get("/api/v1/profile/", format="json")
+        res_data = json.loads(res.content)
+        for k, v in res_data['objects'][0].items():
+            if k == "user":
+                self.assertTrue(v['username'] == "test-user")
+            if k == "answer_question":
+                self.assertTrue(len(v), 3)
+                question_order = 1
+                for each in v:
+                    self.assertTrue(each['answer'], "niu")
+                    self.assertTrue(each['order'], question_order)
