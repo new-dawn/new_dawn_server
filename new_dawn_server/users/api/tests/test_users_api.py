@@ -115,3 +115,19 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         res_data = json.loads(res.content)
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
+
+    def test_user_profile_get_with_filtering(self):
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+
+        res = self.api_client.get("/api/v1/profile/?user__username=test-user", format="json")
+        res_data = json.loads(res.content)
+        for k, v in self.profile_arguments.items():
+            self.assertEqual(res_data['objects'][0][k], v)
+
+        

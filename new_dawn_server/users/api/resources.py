@@ -12,7 +12,7 @@ from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpUnauthorized, HttpForbidden
 from tastypie.models import create_api_key
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 from tastypie.validation import Validation
 
@@ -60,6 +60,7 @@ class UserResource(ModelResource):
         authentication = Authentication()
         authorization = Authorization()
         excludes = ["is_staff", "password"]
+        filtering = {"username": "exact"}
         queryset = User.objects.all()
         resource_name = "user"
 
@@ -127,6 +128,9 @@ class ProfileResource(ModelResource):
         allowed_methods = ["get"]
         authentication = Authentication()
         authorization = Authorization()
+        filtering = { 
+           'user' : ALL_WITH_RELATIONS
+        }
         queryset = Profile.objects.all()
         resource_name = "profile"
 
