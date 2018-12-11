@@ -118,7 +118,6 @@ class UserResource(ModelResource):
             return self.create_response(request, {"success": False}, HttpUnauthorized)
 
     def phone_verify_request(self, request, **kwargs):
-        print("key", settings.ACCOUNT_SECURITY_API_KEY)
         self.method_check(request, allowed=["post"])
         data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
         phone_number = data.get("phone_number", "")
