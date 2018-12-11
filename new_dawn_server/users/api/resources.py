@@ -1,16 +1,19 @@
+from authy.api import AuthyApiClient
 from django import forms
+from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
+from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
-from tastypie.http import HttpUnauthorized, HttpForbidden
+from tastypie.http import HttpForbidden, HttpNoContent, HttpUnauthorized
 from tastypie.models import create_api_key
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
@@ -53,6 +56,8 @@ PROFILE_FIELDS = {
 # Account Name Delimiter
 ACCOUNT_NAME_DELIMITER = "_"
 
+# Create authentication client
+authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
 
 class UserResource(ModelResource):
     class Meta:
@@ -69,6 +74,10 @@ class UserResource(ModelResource):
         return [
             url(r"^user/login/$", self.wrap_view("login"), name="api_login"),
             url(r"^user/logout/$", self.wrap_view("logout"), name="api_logout"),
+            url(r"^user/phone_verify/request/$", 
+                self.wrap_view("phone_verify_request"), name="api_phone_verify_request"),
+            url(r"^user/phone_verify/authenticate/$", 
+                self.wrap_view("phone_verify_authenticate"), name="api_phone_verify_authenticate"),
         ]
 
     def login(self, request, **kwargs):
@@ -92,12 +101,12 @@ class UserResource(ModelResource):
             else:
                 return self.create_response(request, {
                     "success": False,
-                    "reason": "disabled",
+                    "message": "disabled",
                 }, HttpForbidden)
         else:
             return self.create_response(request, {
                 "success": False,
-                "reason": "incorrect",
+                "message": "incorrect",
             }, HttpUnauthorized)
 
     def logout(self, request, **kwargs):
@@ -108,6 +117,46 @@ class UserResource(ModelResource):
         else:
             return self.create_response(request, {"success": False}, HttpUnauthorized)
 
+    def phone_verify_request(self, request, **kwargs):
+        print("key", settings.ACCOUNT_SECURITY_API_KEY)
+        self.method_check(request, allowed=["post"])
+        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
+        phone_number = data.get("phone_number", "")
+        country_code = data.get("country_code", "")
+        via = data.get("via", "sms")
+        if phone_number and country_code:
+            # Start sending verification code
+            authy_api.phones.verification_start(
+                phone_number,
+                country_code,
+                via=via
+            )
+            return self.create_response(request, {"success": True, "message": "Verification Code Sent"})
+        else:
+            return self.create_response(
+                request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
+
+    def phone_verify_authenticate(self, request, **kwargs):
+        self.method_check(request, allowed=["post"])
+        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
+        phone_number = data.get("phone_number", "")
+        country_code = data.get("country_code", "")
+        token = data.get("token", "")
+        if phone_number and country_code:
+            verification = authy_api.phones.verification_check(
+                phone_number,
+                country_code,
+                token
+            )
+            if verification.ok():
+                return self.create_response(request, {"success": True, "message": "Verification Successful"})
+            else:
+                error_msg = ":".join([err in verification.errors().values()]) 
+                return self.create_response(
+                request, {"success": False, "message": error_msg}, HttpNotAcceptable)
+        else:
+            return self.create_response(
+                request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
@@ -128,11 +177,32 @@ class ProfileResource(ModelResource):
         allowed_methods = ["get"]
         authentication = Authentication()
         authorization = Authorization()
-        filtering = { 
-           'user' : ALL_WITH_RELATIONS
+        filtering = {
+            'user': ALL_WITH_RELATIONS
         }
         queryset = Profile.objects.all()
         resource_name = "profile"
+
+    @staticmethod
+    def _get_all_questions_answers(answer_question_obj):
+        result_list = []
+        for answer_question in answer_question_obj:
+            one_question_answer_dict = {
+                'question': answer_question.question.question,
+                'answer': answer_question.answer,
+                'order': answer_question.order,
+                "update_time": answer_question.update_time,
+            }
+            result_list.append(one_question_answer_dict)
+        return result_list
+
+    # Add Answer question fields in Profile Resource
+    def dehydrate(self, bundle):
+        user_id = bundle.data['user'].data['id']
+        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
+        answer_question_lists = self._get_all_questions_answers(answer_question_obj)
+        bundle.data['answer_question'] = answer_question_lists
+        return bundle
 
 
 class UserRegisterValidation(Validation):
