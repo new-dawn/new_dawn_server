@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from tastypie.test import ResourceTestCaseMixin
 from unittest.mock import patch, MagicMock
@@ -21,7 +23,7 @@ class PhoneVerifyTestCase(ResourceTestCaseMixin, TestCase):
 
     # For test purpose, we don't send the actual request with authy api
     # Instead we mock its expected responses and verify we can handle them correctly
-    @patch('new_dawn_server.users.api.resources.authy_api')
+    @patch("new_dawn_server.users.api.resources.authy_api")
     def test_phone_verify_request(self, authy_api):
         authy_api.phones.verification_start = MagicMock()
 
@@ -36,7 +38,7 @@ class PhoneVerifyTestCase(ResourceTestCaseMixin, TestCase):
         authy_api.phones.verification_start.assert_called_with(**self.request_args)
         self.assertEqual(response.status_code, 200)
 
-    @patch('new_dawn_server.users.api.resources.authy_api')
+    @patch("new_dawn_server.users.api.resources.authy_api")
     def test_phone_verify_authenticate(self, authy_api):
         authy_api.phones.verification_check = MagicMock()
         request_sms_response = MagicMock()
@@ -48,7 +50,8 @@ class PhoneVerifyTestCase(ResourceTestCaseMixin, TestCase):
             '/api/v1/user/phone_verify/authenticate/', format="json", data=self.authenticate_args)
         authy_api.phones.verification_check.assert_called_with(**self.authenticate_args)
         self.assertEqual(response.status_code, 200)
-        response["success"] = True
+        res_data = json.loads(response.content)
+        self.assertEqual(res_data["success"], True)
 
         # Failed authentication
         request_sms_response.ok.return_value = False
@@ -57,5 +60,6 @@ class PhoneVerifyTestCase(ResourceTestCaseMixin, TestCase):
             '/api/v1/user/phone_verify/authenticate/', format="json", data=self.authenticate_args)
         authy_api.phones.verification_check.assert_called_with(**self.authenticate_args)
         self.assertEqual(response.status_code, 406) # Not Acceptable
-        response["success"] = False
+        res_data = json.loads(response.content)
+        self.assertEqual(res_data["success"], False)
 
