@@ -13,7 +13,7 @@ from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
-from tastypie.http import HttpForbidden, HttpNoContent, HttpUnauthorized
+from tastypie.http import HttpForbidden, HttpNotAcceptable, HttpNoContent, HttpUnauthorized
 from tastypie.models import create_api_key
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
@@ -126,8 +126,8 @@ class UserResource(ModelResource):
         if phone_number and country_code:
             # Start sending verification code
             authy_api.phones.verification_start(
-                phone_number,
-                country_code,
+                phone_number=phone_number,
+                country_code=country_code,
                 via=via
             )
             return self.create_response(request, {"success": True, "message": "Verification Code Sent"})
@@ -140,17 +140,17 @@ class UserResource(ModelResource):
         data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
         phone_number = data.get("phone_number", "")
         country_code = data.get("country_code", "")
-        token = data.get("token", "")
+        verification_code = data.get("verification_code", "")
         if phone_number and country_code:
             verification = authy_api.phones.verification_check(
-                phone_number,
-                country_code,
-                token
+                phone_number=phone_number,
+                country_code=country_code,
+                verification_code=verification_code
             )
             if verification.ok():
                 return self.create_response(request, {"success": True, "message": "Verification Successful"})
             else:
-                error_msg = ":".join([err in verification.errors().values()]) 
+                error_msg = ":".join([err for err in verification.errors().values()]) 
                 return self.create_response(
                 request, {"success": False, "message": error_msg}, HttpNotAcceptable)
         else:

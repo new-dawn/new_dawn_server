@@ -17,6 +17,10 @@ from dotenv import load_dotenv
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Load environment variables
+# THE ACTUAL .env FILE IS IGNORED IN SERVER REPO BECAUSE IT CONTAINS
+# 1. Variables that are confidential to the public
+# 2. Variables that are set differently between test and prod environment
+# PLEASE GET THAT FILE FROM ADMIN IF YOU WANT TO TEST WITH PROD ENVIRONMENT
 load_dotenv()
 
 
