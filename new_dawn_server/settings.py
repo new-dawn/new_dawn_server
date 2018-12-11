@@ -11,9 +11,17 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Load environment variables
+# THE ACTUAL .env FILE IS IGNORED IN SERVER REPO BECAUSE IT CONTAINS
+# 1. Variables that are confidential to the public
+# 2. Variables that are set differently between test and prod environment
+# PLEASE GET THAT FILE FROM ADMIN IF YOU WANT TO TEST WITH PROD ENVIRONMENT
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +33,7 @@ SECRET_KEY = 'zm9)3y%(5o$i(heucha&q*&8!uiz17yv(w9d@q(9%)0peu5kbq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['django-env.w8iffghn9z.us-west-2.elasticbeanstalk.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['.elasticbeanstalk.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -125,3 +133,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
+
+# Authy Application Key
+ACCOUNT_SECURITY_API_KEY = os.environ.get('ACCOUNT_SECURITY_API_KEY')
