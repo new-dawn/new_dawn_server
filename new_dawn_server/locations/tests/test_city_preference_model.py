@@ -27,3 +27,19 @@ class CityPreferenceTest(TestCase):
         self.assertEqual(test_city_pref.city, "New York")
         self.assertEqual(test_city_pref.state.state, "NY")
         self.assertEqual(test_city_pref.state.country.country, "US")
+
+    def test_user_has_multiple_preference(self):
+        CityPreference.objects.create(
+            city="Potomac",
+            state=State.objects.create(
+                country=Country.objects.create(country="US"),
+                state="MD"
+            ),
+            user_account=Account.objects.get(name="testuser")
+        )
+        test_user = Account.objects.get(name="testuser")
+        test_city_pref = CityPreference.objects.filter(user_account=test_user)
+        self.assertEqual(len(test_city_pref), 2)
+        self.assertEqual(test_city_pref[1].city, "Potomac")
+        self.assertEqual(test_city_pref[1].state.state, "MD")
+        self.assertEqual(test_city_pref[1].state.country.country, "US")
