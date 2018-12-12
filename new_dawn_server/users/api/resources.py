@@ -59,6 +59,7 @@ ACCOUNT_NAME_DELIMITER = "_"
 # Create authentication client
 authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
 
+
 class UserResource(ModelResource):
     class Meta:
         allowed_methods = ["get", "post"]
@@ -74,9 +75,9 @@ class UserResource(ModelResource):
         return [
             url(r"^user/login/$", self.wrap_view("login"), name="api_login"),
             url(r"^user/logout/$", self.wrap_view("logout"), name="api_logout"),
-            url(r"^user/phone_verify/request/$", 
+            url(r"^user/phone_verify/request/$",
                 self.wrap_view("phone_verify_request"), name="api_phone_verify_request"),
-            url(r"^user/phone_verify/authenticate/$", 
+            url(r"^user/phone_verify/authenticate/$",
                 self.wrap_view("phone_verify_authenticate"), name="api_phone_verify_authenticate"),
         ]
 
@@ -150,9 +151,9 @@ class UserResource(ModelResource):
             if verification.ok():
                 return self.create_response(request, {"success": True, "message": "Verification Successful"})
             else:
-                error_msg = ":".join([err for err in verification.errors().values()]) 
+                error_msg = ":".join([err for err in verification.errors().values()])
                 return self.create_response(
-                request, {"success": False, "message": error_msg}, HttpNotAcceptable)
+                    request, {"success": False, "message": error_msg}, HttpNotAcceptable)
         else:
             return self.create_response(
                 request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
