@@ -61,7 +61,6 @@ class ProfileTest(TestCase):
             profile_photo_url="manman.com",
             school="NYU",
             smoke="True",
-            answer_questions=AnswerQuestion.objects.first(),
             user=User.objects.get(username="101010")
         )
 
@@ -73,13 +72,6 @@ class ProfileTest(TestCase):
         self.assertEqual(test_user_account.get_gender_display(), test_user_profile.account.get_gender_display())
         self.assertEqual(test_user_account.birthday, test_user_profile.account.birthday)
 
-    def test_profile_answer_questions(self):
-        test_user_account = Account.objects.get(name="testuser")
-        test_user_profile = Profile.objects.get(account=test_user_account)
-        test_questions = test_user_profile.answer_questions
-        self.assertEqual(test_questions.question.question, "How are you doing?")
-        self.assertEqual(test_questions.order, 1)
-        self.assertEqual(test_questions.answer, "Good Good Good")
 
     def test_profile_boolean_fields(self):
         test_user_account = Account.objects.get(name="testuser")
