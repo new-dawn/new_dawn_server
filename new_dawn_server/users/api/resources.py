@@ -42,7 +42,6 @@ ACCOUNT_FIELDS = {
 }
 
 PROFILE_FIELDS = {
-    "city_preference": False,
     "description": False,
     "employer": False,
     "height": False,
