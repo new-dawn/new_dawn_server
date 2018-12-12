@@ -55,8 +55,8 @@ class CityPreferenceTest(TestCase):
         self.assertEqual(test_city_pref[1].country, "US")
 
     def test_preference_has_multiple_user(self):
-        # Reverse relationship
         test_city_pref = CityPreference.objects.filter(city="New York")[0]
+        # Access reverse many to many relation via _set suffix
         test_users = test_city_pref.account_set.all()
         self.assertEqual(test_users[0].name, self.account1.name)
         self.assertEqual(test_users[1].name, self.account2.name)
