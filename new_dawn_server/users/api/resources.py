@@ -157,6 +157,7 @@ class UserResource(ModelResource):
             return self.create_response(
                 request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
 
+
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
 
