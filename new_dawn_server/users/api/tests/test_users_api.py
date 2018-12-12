@@ -24,7 +24,6 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "gender": "M",
         }
         self.profile_arguments = {
-            "city_preference": "New York",
             "description": "nice",
             "employer": "MANMAN",
             "hometown": "NY",
@@ -146,7 +145,6 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
             "gender": "M",
         }
         self.profile_arguments = {
-            "city_preference": "New York",
             "description": "nice",
             "employer": "MANMAN",
             "hometown": "NY",

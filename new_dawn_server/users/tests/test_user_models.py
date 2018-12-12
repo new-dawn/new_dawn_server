@@ -53,7 +53,6 @@ class ProfileTest(TestCase):
 
         Profile.objects.create(
             account=Account.objects.get(name="testuser"),
-            city_preference="New York",
             description="Good Boy",
             employer="ManMan",
             height=Decimal(180.00),
@@ -90,7 +89,6 @@ class ProfileTest(TestCase):
     def test_profile_char_fields(self):
         test_user_account = Account.objects.get(name="testuser")
         test_user_profile = Profile.objects.get(account=test_user_account)
-        self.assertEqual(test_user_profile.city_preference, "New York")
         self.assertEqual(test_user_profile.description, "Good Boy")
         self.assertEqual(test_user_profile.employer, "ManMan")
         self.assertEqual(test_user_profile.hometown, "Chongqing")
