@@ -21,3 +21,10 @@ class CityPreferenceTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(CityPreference.objects.count(), 1)
         for k, v in self.city_preference_arguments.items():
             self.assertEqual(res_data[k], v)
+
+    def test_location_get(self):
+        self.api_client.post("/api/v1/city_preference/", format="json", data=self.city_preference_arguments)
+        res = self.api_client.get("/api/v1/city_preference/", format="json")
+        res_data = json.loads(res.content)
+        for k, v in self.city_preference_arguments.items():
+            self.assertEqual(res_data['objects'][0][k], v)

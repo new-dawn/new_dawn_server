@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
+from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
@@ -16,7 +17,7 @@ from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpForbidden, HttpNotAcceptable, HttpNoContent, HttpUnauthorized
 from tastypie.models import create_api_key
-from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL
 from tastypie.utils import trailing_slash
 from tastypie.validation import Validation
 
@@ -159,31 +160,62 @@ class UserResource(ModelResource):
                 request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
 
 
+class LocationValidation(Validation):
+    def is_valid(self, bundle, request=None):
+        if not bundle.data.get("city_preference"):
+            return {'__all__': "No data for city_preference"}
+
+        if not isinstance(bundle.data.get("city_preference"), list):
+            return {'__all__': "city_preference is not a list"}
+
+
 class AccountResource(ModelResource):
-    user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
 
     class Meta:
         allowed_methods = ["get", "post"]
         always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
-        queryset = Account.objects.all()
+        queryset = User.objects.all()
         resource_name = "account"
+        validation = LocationValidation()
+
+    @staticmethod
+    def _get_account_name(first_name, last_name):
+        return first_name + ACCOUNT_NAME_DELIMITER + last_name
+
+    @staticmethod
+    def _get_model_fields_dict(bundle, fields):
+        result_dict = {}
+        for field, _ in fields.items():
+            # The field can be None if it's not in the bundle
+            result_dict[field] = bundle.data.get(field)
+        return result_dict
 
     def obj_create(self, bundle, **kwargs):
 
-        user_bundle = self.UserRegisterResource.obj_create(bundle, **kwargs)
-        user_bundle.obj.set_password(bundle.data.get("password"))
-        user_bundle.obj.save()
-        location_bundle = CityResource.obj_create(bundle, **kwargs)
-        location_bundle.save()
-        account = Account(
-            user=user_bundle.obj,
-            name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
-            city_preference=location_bundle.obj,
-            **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
-        )
-        account.save()
+        with transaction.atomic():
+            user_bundle = super(AccountResource, self).obj_create(bundle, **kwargs)
+            user_bundle.obj.set_password(bundle.data.get("password"))
+            user_bundle.obj.save()
+            account = Account(
+                user=user_bundle.obj,
+                name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
+                **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
+            )
+            account.save()
+            # Assume city preference inputs a list of location
+            pref_city_list = bundle.data.get("city_preference")
+
+            for location in pref_city_list:
+                city_pref = CityPreference(
+                    city=location['city'],
+                    state=location['state'],
+                    country=location['country']
+                )
+                city_pref.save()
+                account.city_preference.add(city_pref)
+        return bundle
 
 
 class ProfileResource(ModelResource):
