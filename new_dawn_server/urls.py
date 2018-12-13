@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from new_dawn_server.locations.api.resources import (
+    CityResource
+)
 from new_dawn_server.questions.api.resources import (
     AnswerQuestionResource,
     QuestionResource
@@ -31,6 +34,7 @@ from tastypie.api import Api
 v1_api = Api(api_name='v1')
 v1_api.register(AccountResource())
 v1_api.register(AnswerQuestionResource())
+v1_api.register(CityResource())
 v1_api.register(ProfileResource())
 v1_api.register(QuestionResource())
 v1_api.register(UserRegisterResource())

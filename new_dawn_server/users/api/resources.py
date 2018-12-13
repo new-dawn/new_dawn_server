@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
+from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
@@ -162,11 +163,27 @@ class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
 
     class Meta:
-        allowed_methods = ["get"]
+        allowed_methods = ["get", "post"]
+        always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
         queryset = Account.objects.all()
         resource_name = "account"
+
+    def obj_create(self, bundle, **kwargs):
+
+        user_bundle = self.UserRegisterResource.obj_create(bundle, **kwargs)
+        user_bundle.obj.set_password(bundle.data.get("password"))
+        user_bundle.obj.save()
+        location_bundle = CityResource.obj_create(bundle, **kwargs)
+        location_bundle.save()
+        account = Account(
+            user=user_bundle.obj,
+            name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
+            city_preference=location_bundle.obj,
+            **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
+        )
+        account.save()
 
 
 class ProfileResource(ModelResource):
