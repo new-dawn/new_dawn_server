@@ -40,18 +40,7 @@ class ProfileTest(TestCase):
             name="testuser",
             user=User.objects.create(username="101010")
         )
-        Question.objects.create(
-            question="How are you doing?",
-            sample_answer="Very Good",
-        )
-        AnswerQuestion.objects.create(
-            answer="Good Good Good",
-            order=1,
-            question=Question.objects.first(),
-            user=User.objects.get(username="101010")
-        )
-
-        Profile.objects.create(
+        self.profile = Profile.objects.create(
             account=Account.objects.get(name="testuser"),
             description="Good Boy",
             employer="ManMan",
@@ -61,7 +50,25 @@ class ProfileTest(TestCase):
             profile_photo_url="manman.com",
             school="NYU",
             smoke="True",
-            answer_questions=AnswerQuestion.objects.first(),
+            user=User.objects.get(username="101010")
+        )
+        Question.objects.create(
+            question="How are you doing?",
+            sample_answer="Very Good",
+        )
+        # Multiple answers attached to one profile
+        AnswerQuestion.objects.create(
+            answer="Good Good Good",
+            order=1,
+            profile=self.profile,
+            question=Question.objects.first(),
+            user=User.objects.get(username="101010")
+        )
+        AnswerQuestion.objects.create(
+            answer="Good Good Bad",
+            order=2,
+            profile=self.profile,
+            question=Question.objects.first(),
             user=User.objects.get(username="101010")
         )
 
@@ -76,10 +83,13 @@ class ProfileTest(TestCase):
     def test_profile_answer_questions(self):
         test_user_account = Account.objects.get(name="testuser")
         test_user_profile = Profile.objects.get(account=test_user_account)
-        test_questions = test_user_profile.answer_questions
-        self.assertEqual(test_questions.question.question, "How are you doing?")
-        self.assertEqual(test_questions.order, 1)
-        self.assertEqual(test_questions.answer, "Good Good Good")
+        # Access reverse relationship from profile to answer questions via _set suffix
+        test_answer_questions = test_user_profile.answerquestion_set.all()
+        self.assertEqual(test_answer_questions[0].question.question, "How are you doing?")
+        self.assertEqual(test_answer_questions[0].order, 1)
+        self.assertEqual(test_answer_questions[0].answer, "Good Good Good")
+        self.assertEqual(test_answer_questions[1].order, 2)
+        self.assertEqual(test_answer_questions[1].answer, "Good Good Bad")
 
     def test_profile_boolean_fields(self):
         test_user_account = Account.objects.get(name="testuser")
