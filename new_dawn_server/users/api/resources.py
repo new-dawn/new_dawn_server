@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
+from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
@@ -94,30 +95,41 @@ class UserResource(ModelResource):
         if user:
             if user.is_active:
                 login(request, user)
+                
                 # Return username and access token to store in iOS keychain
-                return self.create_response(request, {
-                    "success": True,
-                    "username": user.username,
-                    "token": user.api_key.key,
-                })
+                client_response_success = ClientResponse(
+                    success=True, 
+                    message="Login Successful", 
+                    username=user.username, 
+                    token=user.api_key.key,
+                )
+                
+                return self.create_response(
+                    request, client_response_success.get_response_as_dict())
             else:
-                return self.create_response(request, {
-                    "success": False,
-                    "message": "disabled",
-                }, HttpForbidden)
+                return self.create_response(request, ClientResponse(
+                    success=False, 
+                    message="Account has been disabled", 
+                ).get_response_as_dict(), HttpForbidden)
         else:
-            return self.create_response(request, {
-                "success": False,
-                "message": "incorrect",
-            }, HttpUnauthorized)
+            return self.create_response(request, ClientResponse(
+                success=False, 
+                message="Account login info doesn't match", 
+            ).get_response_as_dict(), HttpUnauthorized)
 
     def logout(self, request, **kwargs):
         self.method_check(request, allowed=["get"])
         if request.user and request.user.is_authenticated():
             logout(request)
-            return self.create_response(request, {"success": True})
+            return self.create_response(request, ClientResponse(
+                success=True, 
+                message="Logout Successful", 
+            ).get_response_as_dict())
         else:
-            return self.create_response(request, {"success": False}, HttpUnauthorized)
+            return self.create_response(request, ClientResponse(
+                success=False, 
+                message="Logout Failed: Not authenticated", 
+            ).get_response_as_dict(), HttpUnauthorized)
 
     def phone_verify_request(self, request, **kwargs):
         self.method_check(request, allowed=["post"])
@@ -132,10 +144,16 @@ class UserResource(ModelResource):
                 country_code=country_code,
                 via=via
             )
-            return self.create_response(request, {"success": True, "message": "Verification Code Sent"})
+            return self.create_response(request, ClientResponse(
+                success=True, 
+                message="Verification Code Sent", 
+            ).get_response_as_dict())
         else:
             return self.create_response(
-                request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
+                request, ClientResponse(
+                success=False, 
+                message="Missing country code and phone number", 
+            ).get_response_as_dict(), HttpNoContent)
 
     def phone_verify_authenticate(self, request, **kwargs):
         self.method_check(request, allowed=["post"])
@@ -150,14 +168,22 @@ class UserResource(ModelResource):
                 verification_code=verification_code
             )
             if verification.ok():
-                return self.create_response(request, {"success": True, "message": "Verification Successful"})
+                return self.create_response(request, ClientResponse(
+                    success=True, 
+                    message="Verification Successful", 
+                ).get_response_as_dict())
             else:
                 error_msg = ":".join([err for err in verification.errors().values()])
-                return self.create_response(
-                    request, {"success": False, "message": error_msg}, HttpNotAcceptable)
+                return self.create_response(request, ClientResponse(
+                    success=False, 
+                    message=error_msg, 
+                ).get_response_as_dict(), HttpNotAcceptable)
         else:
             return self.create_response(
-                request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
+                request, ClientResponse(
+                    success=False, 
+                    message="Missing country code and phone number", 
+                ).get_response_as_dict(), HttpNoContent)
 
 
 class AccountResource(ModelResource):

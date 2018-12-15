@@ -1,6 +1,9 @@
 # IDE
 .idea/
 
+# Mypy
+.mypy_cache/
+
 # Virtualenv
 new_dawn/
 
