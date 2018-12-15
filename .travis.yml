@@ -7,6 +7,6 @@ before_script:
   - python manage.py makemigrations --check --dry-run
   - python manage.py migrate
 script:
-  - mypy -p new_dawn_server.modules
+  - mypy -p new_dawn_server.modules --ignore-missing-import
   - python pre_tests.py
   - python manage.py test 
