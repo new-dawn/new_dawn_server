@@ -17,7 +17,7 @@ from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpForbidden, HttpNotAcceptable, HttpNoContent, HttpUnauthorized
 from tastypie.models import create_api_key
-from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 from tastypie.validation import Validation
 
@@ -244,8 +244,9 @@ class UserRegisterResource(ModelResource):
         return first_name + ACCOUNT_NAME_DELIMITER + last_name
 
     @staticmethod
-    def deserialize_city_pref(bundle, account):
+    def get_and_save_city_pref(bundle):
         pref_city_list = bundle.data.get("city_preference")
+        location_list = []
         if pref_city_list:
             for location in pref_city_list:
                 city_pref = CityPreference(
@@ -254,7 +255,8 @@ class UserRegisterResource(ModelResource):
                     country=location['country']
                 )
                 city_pref.save()
-                account.city_preference.add(city_pref)
+                location_list.append(city_pref)
+        return location_list
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -272,9 +274,8 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
             )
             account.save()
-
-            # Deserialize City Preference Information and add to account
-            self.deserialize_city_pref(bundle, account)
+            city_preference_ls = self.get_and_save_city_pref(bundle)
+            account.city_preference.set(city_preference_ls)
 
             profile = Profile(
                 user=user_bundle.obj,
