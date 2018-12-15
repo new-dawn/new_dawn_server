@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import signals
+from new_dawn_server.locations.api.resources import CityResource
+from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion
 from new_dawn_server.users.models import Account
@@ -186,9 +188,11 @@ class UserResource(ModelResource):
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True)
 
     class Meta:
         allowed_methods = ["get"]
+        always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
         queryset = Account.objects.all()
@@ -265,6 +269,21 @@ class UserRegisterResource(ModelResource):
     def _get_account_name(first_name, last_name):
         return first_name + ACCOUNT_NAME_DELIMITER + last_name
 
+    @staticmethod
+    def get_and_save_city_pref(bundle):
+        pref_city_list = bundle.data.get("city_preference")
+        location_list = []
+        if pref_city_list:
+            for location in pref_city_list:
+                city_pref = CityPreference(
+                    city=location['city'],
+                    state=location['state'],
+                    country=location['country']
+                )
+                city_pref.save()
+                location_list.append(city_pref)
+        return location_list
+
     def obj_create(self, bundle, **kwargs):
         """
         Override obj_create method to create related models
@@ -281,6 +300,9 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
             )
             account.save()
+            city_preference_ls = self.get_and_save_city_pref(bundle)
+            account.city_preference.set(city_preference_ls)
+
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
