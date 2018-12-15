@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'new_dawn_server',
     'new_dawn_server.actions',
     'new_dawn_server.locations',
+    'new_dawn_server.medias',
     'new_dawn_server.questions',
     'new_dawn_server.users',
     'phonenumber_field',
