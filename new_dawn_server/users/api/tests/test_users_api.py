@@ -126,7 +126,6 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
 
         res = self.api_client.get("/api/v1/profile/?user__username=test-user", format="json")
         res_data = json.loads(res.content)
-        print(res_data)
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
@@ -194,7 +193,6 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
             )
         res = self.api_client.get("/api/v1/profile/", format="json")
         res_data = json.loads(res.content)
-        #print(res_data)
         for k, v in res_data['objects'][0].items():
             if k == "user":
                 self.assertTrue(v['username'] == "test-user")

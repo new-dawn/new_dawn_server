@@ -160,62 +160,17 @@ class UserResource(ModelResource):
                 request, {"success": False, "message": "Missing phone_number or country_code"}, HttpNoContent)
 
 
-class LocationValidation(Validation):
-    def is_valid(self, bundle, request=None):
-        if not bundle.data.get("city_preference"):
-            return {'__all__': "No data for city_preference"}
-
-        if not isinstance(bundle.data.get("city_preference"), list):
-            return {'__all__': "city_preference is not a list"}
-
-
 class AccountResource(ModelResource):
+    user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True)
 
     class Meta:
-        allowed_methods = ["get", "post"]
+        allowed_methods = ["get"]
         always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
-        queryset = User.objects.all()
+        queryset = Account.objects.all()
         resource_name = "account"
-        validation = LocationValidation()
-
-    @staticmethod
-    def _get_account_name(first_name, last_name):
-        return first_name + ACCOUNT_NAME_DELIMITER + last_name
-
-    @staticmethod
-    def _get_model_fields_dict(bundle, fields):
-        result_dict = {}
-        for field, _ in fields.items():
-            # The field can be None if it's not in the bundle
-            result_dict[field] = bundle.data.get(field)
-        return result_dict
-
-    def obj_create(self, bundle, **kwargs):
-
-        with transaction.atomic():
-            user_bundle = super(AccountResource, self).obj_create(bundle, **kwargs)
-            user_bundle.obj.set_password(bundle.data.get("password"))
-            user_bundle.obj.save()
-            account = Account(
-                user=user_bundle.obj,
-                name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
-                **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
-            )
-            account.save()
-            # Assume city preference inputs a list of location
-            pref_city_list = bundle.data.get("city_preference")
-
-            for location in pref_city_list:
-                city_pref = CityPreference(
-                    city=location['city'],
-                    state=location['state'],
-                    country=location['country']
-                )
-                city_pref.save()
-                account.city_preference.add(city_pref)
-        return bundle
 
 
 class ProfileResource(ModelResource):
@@ -288,6 +243,19 @@ class UserRegisterResource(ModelResource):
     def _get_account_name(first_name, last_name):
         return first_name + ACCOUNT_NAME_DELIMITER + last_name
 
+    @staticmethod
+    def deserialize_city_pref(bundle, account):
+        pref_city_list = bundle.data.get("city_preference")
+        if pref_city_list:
+            for location in pref_city_list:
+                city_pref = CityPreference(
+                    city=location['city'],
+                    state=location['state'],
+                    country=location['country']
+                )
+                city_pref.save()
+                account.city_preference.add(city_pref)
+
     def obj_create(self, bundle, **kwargs):
         """
         Override obj_create method to create related models
@@ -304,6 +272,10 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
             )
             account.save()
+
+            # Deserialize City Preference Information and add to account
+            self.deserialize_city_pref(bundle, account)
+
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
