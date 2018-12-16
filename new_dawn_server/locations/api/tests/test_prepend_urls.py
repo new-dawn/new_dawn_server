@@ -8,7 +8,6 @@ from tastypie.test import ResourceTestCaseMixin
 class CityMappingTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.headers = {"Content-Type": "application/json"}
         self.country_testcase = {"country": "United States"}
         self.state_testcase = {"state": "Utah"}
 
@@ -21,8 +20,15 @@ class CityMappingTest(ResourceTestCaseMixin, TestCase):
 
     def test_get_state_for_country(self):
         res = self.api_client.get(
-            "/api/v1/city_preference/get_state_for_country/", data=self.country_testcase, headers=self.headers
+            "/api/v1/city_preference/get_state_for_country/", format='json', data=self.country_testcase
         )
         res_data = json.loads(res.content)
-        print(res_data)
         self.assertEqual(res_data["state_list"], country_list["United States"])
+
+    def test_get_city_for_state(self):
+        city_state_testcase = {**self.country_testcase, **self.state_testcase}
+        res = self.api_client.get(
+            "/api/v1/city_preference/get_city_for_state/", format='json', data=city_state_testcase
+        )
+        res_data = json.loads(res.content)
+        self.assertEqual(res_data["city_list"], us_city_mapping["Utah"])

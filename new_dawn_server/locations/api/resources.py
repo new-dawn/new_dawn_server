@@ -13,9 +13,9 @@ class CityResource(ModelResource):
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         filtering = {
-            'country': "exact",
-            'state': "exact"
-        },
+                        'country': "exact",
+                        'state': "exact"
+                    },
         queryset = CityPreference.objects.all()
         resource_name = "city_preference"
 
@@ -33,26 +33,25 @@ class CityResource(ModelResource):
         # TODO: Complete country list
         self.method_check(request, allowed=["get"])
         return self.create_response(request,
-            ClientResponse(
-                success=True,
-                message="Country list sent",
-                country_list=list(country_list.keys())
-            ).get_response_as_dict()
-        )
+                                    ClientResponse(
+                                        success=True,
+                                        message="Country list sent",
+                                        country_list=list(country_list.keys())
+                                    ).get_response_as_dict()
+                                    )
 
     def get_state_for_country(self, request, **kwargs):
         self.method_check(request, allowed=["get"])
-        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
-        country = data.get("country", "")
+        country = request.GET.get("country", "")
         if country:
             # TODO: Change to more complete hierarchical country mapping
             return self.create_response(request,
-                ClientResponse(
-                    success=True,
-                    message="State list sent",
-                    state_list=country_list[country])
-                .get_response_as_dict()
-            )
+                                        ClientResponse(
+                                            success=True,
+                                            message="State list sent",
+                                            state_list=country_list[country])
+                                        .get_response_as_dict()
+                                        )
 
         else:
             return self.create_response(request, ClientResponse(
@@ -62,19 +61,18 @@ class CityResource(ModelResource):
 
     def get_city_for_state(self, request, **kwargs):
         self.method_check(request, allowed=["get"])
-        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
-        country = data.get("country", "")
-        state = data.get("state", "")
+        country = request.GET.get("country", "")
+        state = request.GET.get("state", "")
         if country and state:
             if country == "United States":
                 # TODO: Capture not match error
                 return self.create_response(request,
-                    ClientResponse(
-                        success=True,
-                        message="City list sent",
-                        city_list=list(us_city_mapping[state])
-                    ).get_response_as_dict()
-                )
+                                            ClientResponse(
+                                                success=True,
+                                                message="City list sent",
+                                                city_list=list(us_city_mapping[state])
+                                            ).get_response_as_dict()
+                                            )
         else:
             return self.create_response(request, ClientResponse(
                 success=False,
