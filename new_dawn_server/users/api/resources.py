@@ -9,7 +9,7 @@ from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
-from new_dawn_server.questions.models import AnswerQuestion
+from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
@@ -95,26 +95,26 @@ class UserResource(ModelResource):
         if user:
             if user.is_active:
                 login(request, user)
-                
+
                 # Return username and access token to store in iOS keychain
                 client_response_success = ClientResponse(
-                    success=True, 
-                    message="Login Successful", 
-                    username=user.username, 
+                    success=True,
+                    message="Login Successful",
+                    username=user.username,
                     token=user.api_key.key,
                 )
-                
+
                 return self.create_response(
                     request, client_response_success.get_response_as_dict())
             else:
                 return self.create_response(request, ClientResponse(
-                    success=False, 
-                    message="Account has been disabled", 
+                    success=False,
+                    message="Account has been disabled",
                 ).get_response_as_dict(), HttpForbidden)
         else:
             return self.create_response(request, ClientResponse(
-                success=False, 
-                message="Account login info doesn't match", 
+                success=False,
+                message="Account login info doesn't match",
             ).get_response_as_dict(), HttpUnauthorized)
 
     def logout(self, request, **kwargs):
@@ -122,13 +122,13 @@ class UserResource(ModelResource):
         if request.user and request.user.is_authenticated():
             logout(request)
             return self.create_response(request, ClientResponse(
-                success=True, 
-                message="Logout Successful", 
+                success=True,
+                message="Logout Successful",
             ).get_response_as_dict())
         else:
             return self.create_response(request, ClientResponse(
-                success=False, 
-                message="Logout Failed: Not authenticated", 
+                success=False,
+                message="Logout Failed: Not authenticated",
             ).get_response_as_dict(), HttpUnauthorized)
 
     def phone_verify_request(self, request, **kwargs):
@@ -145,15 +145,15 @@ class UserResource(ModelResource):
                 via=via
             )
             return self.create_response(request, ClientResponse(
-                success=True, 
-                message="Verification Code Sent", 
+                success=True,
+                message="Verification Code Sent",
             ).get_response_as_dict())
         else:
             return self.create_response(
                 request, ClientResponse(
-                success=False, 
-                message="Missing country code and phone number", 
-            ).get_response_as_dict(), HttpNoContent)
+                    success=False,
+                    message="Missing country code and phone number",
+                ).get_response_as_dict(), HttpNoContent)
 
     def phone_verify_authenticate(self, request, **kwargs):
         self.method_check(request, allowed=["post"])
@@ -169,20 +169,20 @@ class UserResource(ModelResource):
             )
             if verification.ok():
                 return self.create_response(request, ClientResponse(
-                    success=True, 
-                    message="Verification Successful", 
+                    success=True,
+                    message="Verification Successful",
                 ).get_response_as_dict())
             else:
                 error_msg = ":".join([err for err in verification.errors().values()])
                 return self.create_response(request, ClientResponse(
-                    success=False, 
-                    message=error_msg, 
+                    success=False,
+                    message=error_msg,
                 ).get_response_as_dict(), HttpNotAcceptable)
         else:
             return self.create_response(
                 request, ClientResponse(
-                    success=False, 
-                    message="Missing country code and phone number", 
+                    success=False,
+                    message="Missing country code and phone number",
                 ).get_response_as_dict(), HttpNoContent)
 
 
@@ -284,6 +284,33 @@ class UserRegisterResource(ModelResource):
                 location_list.append(city_pref)
         return location_list
 
+    @staticmethod
+    def get_and_save_question(bundle):
+
+        if not Question.objects.filter(question=bundle['question']).exists():
+            question = Question(
+                question=bundle['question']
+            )
+            question.save()
+        else:
+            question = Question.objects.get(question=bundle['question'])
+        return question
+
+    @staticmethod
+    def get_and_save_answer_question(bundle, user, profile):
+        questions_bundle = bundle.data.get("answer_question")
+        if questions_bundle:
+            for single_question_bundle in questions_bundle:
+                question = UserRegisterResource.get_and_save_question(single_question_bundle)
+                answer_question = AnswerQuestion(
+                    answer=single_question_bundle['answer'],
+                    order=single_question_bundle['order'],
+                    profile=profile,
+                    question=question,
+                    user=user
+                )
+                answer_question.save()
+
     def obj_create(self, bundle, **kwargs):
         """
         Override obj_create method to create related models
@@ -300,6 +327,7 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
             )
             account.save()
+
             city_preference_ls = self.get_and_save_city_pref(bundle)
             account.city_preference.set(city_preference_ls)
 
@@ -309,6 +337,9 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
             )
             profile.save()
+
+            self.get_and_save_answer_question(bundle, user_bundle.obj, profile)
+
         return bundle
 
     def dehydrate(self, bundle):
