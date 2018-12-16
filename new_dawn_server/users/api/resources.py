@@ -289,7 +289,8 @@ class UserRegisterResource(ModelResource):
 
         if not Question.objects.filter(question=bundle['question']).exists():
             question = Question(
-                question=bundle['question']
+                question=bundle['question'],
+                user_defined=True
             )
             question.save()
         else:

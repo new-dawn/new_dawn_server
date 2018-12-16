@@ -42,12 +42,18 @@ class AnswerQuestionInRegisterTest(ResourceTestCaseMixin, TestCase):
                     "order": 2,
                     "answer": "do do"
                 }
-            ]
+            ]}
+
+        self.pre_defined_question_arguments = {
+            "question": "how are you",
+            "sample_answer": "ummm",
+            "user_defined": False
         }
+        self.api_client.post("/api/v1/question/", format="json", data=self.pre_defined_question_arguments)
 
     def test_register_with_answer_question(self):
         self.assertEqual(User.objects.count(), 0)
-        self.assertEqual(Question.objects.count(), 0)
+        self.assertEqual(Question.objects.count(), 1)
         self.assertEqual(Profile.objects.count(), 0)
         self.assertEqual(AnswerQuestion.objects.count(), 0)
 
@@ -72,3 +78,22 @@ class AnswerQuestionInRegisterTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(res_data['answer_question'][0][k], v)
         for k, v in self.answer_question_arguments["answer_question"][1].items():
             self.assertEqual(res_data['answer_question'][1][k], v)
+
+    def test_predefined_question(self):
+        self.assertEqual(Question.objects.count(), 1)
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments,
+            **self.answer_question_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+        self.assertEqual(Question.objects.count(), 2)
+        question = Question.objects.filter(question="how are you")
+        self.assertEqual(question.count(), 1)
+        self.assertEqual(question.get().question, "how are you")
+        self.assertEqual(question.get().sample_answer, "ummm")
+        self.assertEqual(question.get().user_defined, False)
+
+
