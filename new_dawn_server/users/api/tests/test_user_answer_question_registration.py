@@ -95,5 +95,3 @@ class AnswerQuestionInRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(question.get().question, "how are you")
         self.assertEqual(question.get().sample_answer, "ummm")
         self.assertEqual(question.get().user_defined, False)
-
-
