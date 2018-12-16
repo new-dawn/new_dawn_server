@@ -6,10 +6,10 @@
 2. Download virtualenv
 3. Run `virtualenv new_dawn` to create a virtual env
 4. Activate your virtual env by running `source new_dawn/bin/activate`
-5. Run `pip install -r requirements.txt` to install dependencies
+5. Run `pip3 install -r requirements.txt` to install dependencies
 
 ## Run Server & Test API
-1. Run local server `python manage.py runserver`.
+1. Run local server `python3 manage.py runserver`.
 2. In another terminal session, use `curl` to GET/POST your request.
 
 ### Example
@@ -45,13 +45,13 @@ Except for required fields, there are some optional fields that you can lookup f
 
 ## Dev Data Model
 * Data models are stored in directories such as `users/models.py`. Make changes you want in `models.py`.
-* Run `python manage.py makemigrations` and `python manage.py migrate`. If everything works fine, you should be able to see the following messages:
+* Run `python3 manage.py makemigrations` and `python3 manage.py migrate`. If everything works fine, you should be able to see the following messages:
 ```
-(new_dawn) TZY-Mac:new_dawn_server Tang$ python manage.py makemigrations
+(new_dawn) TZY-Mac:new_dawn_server Tang$ python3 manage.py makemigrations
 Migrations for 'users':
   new_dawn_server/users/migrations/0002_remove_account_nationality.py
     - Remove field nationality from account
-(new_dawn) TZY-Mac:new_dawn_server Tang$ python manage.py migrate
+(new_dawn) TZY-Mac:new_dawn_server Tang$ python3 manage.py migrate
 Operations to perform:
   Apply all migrations: admin, auth, contenttypes, sessions, users
 Running migrations:
