@@ -1,7 +1,7 @@
 import json
 
 from django.test import TestCase
-from new_dawn_server.locations.college_constants import college_names
+from new_dawn_server.locations.constants.college_constants import college_names
 from tastypie.test import ResourceTestCaseMixin
 
 

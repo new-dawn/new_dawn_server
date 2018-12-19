@@ -1,6 +1,6 @@
 from django.conf.urls import url
-from new_dawn_server.locations.city_constants import us_city_mapping, country_list
-from new_dawn_server.locations.college_constants import college_names
+from new_dawn_server.locations.constants.city_constants import us_city_mapping, country_list
+from new_dawn_server.locations.constants.college_constants import college_names
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
 from tastypie.authorization import Authorization
