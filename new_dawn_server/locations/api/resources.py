@@ -1,5 +1,6 @@
 from django.conf.urls import url
-from new_dawn_server.locations.constants import us_city_mapping, country_list
+from new_dawn_server.locations.city_constants import us_city_mapping, country_list
+from new_dawn_server.locations.college_constants import college_names
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
 from tastypie.authorization import Authorization
@@ -27,6 +28,8 @@ class CityResource(ModelResource):
                 name="api_get_state_for_country"),
             url(r"^city_preference/get_city_for_state/$", self.wrap_view("get_city_for_state"),
                 name="api_get_city_for_country"),
+            url(r"^city_preference/get_college_list/$", self.wrap_view("get_college_list"),
+                name="api_get_college_list")
         ]
 
     def get_country_list(self, request, **kwargs):
@@ -78,3 +81,13 @@ class CityResource(ModelResource):
                 success=False,
                 message="Not given country/City name",
             ).get_response_as_dict(), HttpBadRequest)
+
+    def get_college_list(self, request, **kwargs):
+        # TODO: Complete college list
+        self.method_check(request, allowed=["get"])
+        return self.create_response(request,
+                                    ClientResponse(
+                                        success=True,
+                                        message="College list sent",
+                                        college_list=college_names
+                                    ).get_response_as_dict())

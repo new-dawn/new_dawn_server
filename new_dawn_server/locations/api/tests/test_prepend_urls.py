@@ -1,7 +1,7 @@
 import json
 
 from django.test import TestCase
-from new_dawn_server.locations.constants import us_city_mapping, country_list
+from new_dawn_server.locations.city_constants import us_city_mapping, country_list
 from tastypie.test import ResourceTestCaseMixin
 
 
