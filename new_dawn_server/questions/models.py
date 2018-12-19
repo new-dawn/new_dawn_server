@@ -6,6 +6,7 @@ from new_dawn_server.users.models import Profile
 class Question(models.Model):
     question = models.CharField(max_length=150)
     sample_answer = models.CharField(blank=True, max_length=150, null=True)
+    user_defined = models.BooleanField(blank=True, null=True)
 
 
 class AnswerQuestion(models.Model):

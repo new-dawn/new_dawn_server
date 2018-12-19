@@ -20,6 +20,9 @@ class QuestionResource(ModelResource):
         always_return_data = True
         authorization = Authorization()
         allowed_methods = ["get", "post"]
+        filtering = {
+            "user_defined": "exact"
+        }
         queryset = Question.objects.all()
         resource_name = "question"
 

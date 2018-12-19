@@ -12,6 +12,7 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
         self.question_argument = {
             "question": "How are you doing?",
             "sample_answer": "Pretty Good",
+            "user_defined": True
         }
         self.answer_question_argument = {
             "order": 1,
@@ -43,12 +44,16 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
     def test_question_get_resource(self):
         self.api_client.post(
             "/api/v1/question/", format="json", data=self.question_argument)
-        res = self.api_client.get("/api/v1/question/", format="json")
+        res = self.api_client.get("/api/v1/question/?user_defined=True", format="json")
         res_data = json.loads(res.content)
         # Verify all the data gets populated
         for k, v in self.question_argument.items():
             self.assertTrue(k in res_data['objects'][0])
             self.assertTrue(v, res_data['objects'][0][k])
+        # Verify user_defined filter is available
+        pre_defined_question_res = self.api_client.get("/api/v1/question/?user_defined=False", format="json")
+        res_data = json.loads(pre_defined_question_res.content)
+        self.assertEqual(len(res_data['objects']), 0)
 
     def test_answer_question_post_resource(self):
         self.assertEqual(User.objects.count(), 1)
