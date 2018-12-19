@@ -1,6 +1,6 @@
 from django.conf.urls import url
-from new_dawn_server.locations.constants.city_constants import us_city_mapping, country_list
-from new_dawn_server.locations.constants.college_constants import college_names
+from new_dawn_server.locations.constants.city_constants import US_CITY_MAPPING, COUNTRY_LIST
+from new_dawn_server.locations.constants.college_constants import COLLEGE_NAMES
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
 from tastypie.authorization import Authorization
@@ -39,7 +39,7 @@ class CityResource(ModelResource):
                                     ClientResponse(
                                         success=True,
                                         message="Country list sent",
-                                        country_list=list(country_list.keys())
+                                        country_list=list(COUNTRY_LIST.keys())
                                     ).get_response_as_dict()
                                     )
 
@@ -52,7 +52,7 @@ class CityResource(ModelResource):
                                         ClientResponse(
                                             success=True,
                                             message="State list sent",
-                                            state_list=country_list[country])
+                                            state_list=COUNTRY_LIST[country])
                                         .get_response_as_dict()
                                         )
 
@@ -73,7 +73,7 @@ class CityResource(ModelResource):
                                             ClientResponse(
                                                 success=True,
                                                 message="City list sent",
-                                                city_list=list(us_city_mapping[state])
+                                                city_list=list(US_CITY_MAPPING[state])
                                             ).get_response_as_dict()
                                             )
         else:
@@ -89,5 +89,5 @@ class CityResource(ModelResource):
                                     ClientResponse(
                                         success=True,
                                         message="College list sent",
-                                        college_list=college_names
+                                        college_list=COLLEGE_NAMES
                                     ).get_response_as_dict())

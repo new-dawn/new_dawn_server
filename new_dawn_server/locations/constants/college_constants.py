@@ -1,4 +1,4 @@
-college_names = ['Bay Mills Community College', 'Central Carolina Technical College', 'Aveda Institute Tucson',
+COLLEGE_NAMES = ['Bay Mills Community College', 'Central Carolina Technical College', 'Aveda Institute Tucson',
                  'Cloud County Community College', 'Onondaga Community College', 'Georgetown University',
                  'Philadelphia Technician Training', 'Jefferson Technical College', 'Cinta Aveda Institute',
                  'Amarillo College', 'Eastern Florida State College', 'Hondros College of Nursing',

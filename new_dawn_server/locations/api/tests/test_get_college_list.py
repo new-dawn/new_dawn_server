@@ -1,7 +1,7 @@
 import json
 
 from django.test import TestCase
-from new_dawn_server.locations.constants.college_constants import college_names
+from new_dawn_server.locations.constants.college_constants import COLLEGE_NAMES
 from tastypie.test import ResourceTestCaseMixin
 
 
@@ -14,4 +14,4 @@ class CollegeNameTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/city_preference/get_college_list/", format="json"
         )
         res_data = json.loads(res.content)
-        self.assertEqual(res_data['college_list'], college_names)
+        self.assertEqual(res_data['college_list'], COLLEGE_NAMES)
