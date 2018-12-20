@@ -1,7 +1,9 @@
-import base64
 import json
+import os
+import re
+
 from django.contrib.auth.models import User
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models.fields.files import ImageFieldFile
 from django.test import TestCase
 from new_dawn_server.medias.models import Image
 from tastypie.test import ResourceTestCaseMixin
@@ -28,14 +30,13 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
         }
 
     def test_upload_photo_multipart(self):
-        # Expect front-end to send base64 encoded image binary
-        with open("media/images/test.png", "rb") as photo:
+        with open("media/images/test.png", "rb") as photo_file:
             test_data_json = json.dumps(self.test_data)
-            test_photo_encoded = base64.b64encode(photo.read())
-
+            # The full data should have a json serialized dict
+            # and an actual File instance
             full_data = {
                 "data": test_data_json, 
-                "media": photo,
+                "media": photo_file,
             }
 
             # Data should be of the form:
@@ -50,21 +51,23 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
             )
             self.assertEquals(response.status_code, 201)
 
-            # Test upload success
-            self.assertEqual(Image.objects.count(), 1)
+            # Test upload success: basic info
+            self.assertEquals(Image.objects.count(), 1)
             image = Image.objects.all()[0]
             self.assertEquals(image.caption, "good")
             self.assertEquals(image.order, 1)
             self.assertEquals(
                 image.user, User.objects.get(username="test-user"))
-            print(image.media)
 
-            res = self.api_client.get("/api/v1/image/", format="json")
-            res_data = json.loads(res.content)
-            print(res_data)
-            for k, v in res_data['objects'][0].items():
-                if k == "user":
-                    self.assertTrue(v['username'] == "test-user")
+            # Test upload success: image file
+            file = image.media
+            self.assertTrue(isinstance(file, ImageFieldFile))
+            self.assertTrue(file.name.startswith("images/test_"))
+            self.assertTrue(file.name.endswith(".png"))
+            self.assertTrue(file.url.startswith("/media/images/test_"))
+
+            # Remove the uploaded file
+            os.remove(file.path)
 
 
 

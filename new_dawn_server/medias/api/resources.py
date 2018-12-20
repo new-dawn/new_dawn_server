@@ -2,6 +2,7 @@ import json
 import re
 
 from django.contrib.auth.models import User
+from django.utils.datastructures import MultiValueDict
 from new_dawn_server.medias.models import Image
 from new_dawn_server.users.models import Profile
 from new_dawn_server.users.api.resources import UserResource
@@ -12,16 +13,17 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 
 class MultipartResource(object):
     def deserialize(self, request, data, format=None):
-        # Tastypie has no good support for multipart request
-        # have to override the deserialize function as a whole
         if not format:
              format = request.META.get("CONTENT_TYPE", "application/json")
         if format =="application/x-www-form-urlencoded":
             return request.POST
         if format.startswith("multipart"):
-            data = json.loads(request.POST.get("data"))
-            data.update(request.FILES.get("media"))
-            return data
+            # Tastypie has no good support for multipart request
+            # Have to build our own MultiValueDict from QuerySet
+            new_dict = MultiValueDict()
+            new_dict.update(json.loads(request.POST.get("data")))
+            new_dict.update(request.FILES)
+            return new_dict
         return super(MultipartResource, self).deserialize(request, data, format)
 
 
