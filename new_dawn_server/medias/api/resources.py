@@ -20,7 +20,7 @@ class MultipartResource(object):
             return request.POST
         if format.startswith("multipart"):
             data = json.loads(request.POST.get("data"))
-            data.update(request.FILES["media"])
+            data.update(request.FILES.get("media"))
             return data
         return super(MultipartResource, self).deserialize(request, data, format)
 

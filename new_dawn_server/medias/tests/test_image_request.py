@@ -33,7 +33,6 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
             test_data_json = json.dumps(self.test_data)
             test_photo_encoded = base64.b64encode(photo.read())
 
-            # Expect front-end to encode the media via base64
             full_data = {
                 "data": test_data_json, 
                 "media": photo,
@@ -49,13 +48,23 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
                 '/api/v1/image/',
                 data=full_data,
             )
-            photo.close()
             self.assertEquals(response.status_code, 201)
+
+            # Test upload success
+            self.assertEqual(Image.objects.count(), 1)
+            image = Image.objects.all()[0]
+            self.assertEquals(image.caption, "good")
+            self.assertEquals(image.order, 1)
+            self.assertEquals(
+                image.user, User.objects.get(username="test-user"))
+            print(image.media)
 
             res = self.api_client.get("/api/v1/image/", format="json")
             res_data = json.loads(res.content)
+            print(res_data)
             for k, v in res_data['objects'][0].items():
                 if k == "user":
                     self.assertTrue(v['username'] == "test-user")
+
 
 
