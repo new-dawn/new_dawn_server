@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'new_dawn_server',
     'new_dawn_server.actions',
     'new_dawn_server.locations',
+    'new_dawn_server.medias',
     'new_dawn_server.questions',
     'new_dawn_server.users',
     'phonenumber_field',
@@ -131,9 +132,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 # Authy Application Key
 ACCOUNT_SECURITY_API_KEY = os.environ.get('ACCOUNT_SECURITY_API_KEY')

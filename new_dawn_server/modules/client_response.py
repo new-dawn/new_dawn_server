@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 class ClientResponse:
     '''
-    An object for unifying client response with support for formating and logging
+    An class for unifying client response with support for formating and logging
     A valid client response must include "success" field and "message" field
     Other fields can be passed via kwargs
     '''

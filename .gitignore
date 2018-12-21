@@ -12,6 +12,9 @@ new_dawn/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+# Test generated files
+media/images/test_*.png
+
 # Created by https://www.gitignore.io
 
 ### OSX ###

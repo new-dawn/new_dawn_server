@@ -70,7 +70,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             else:
                 self.assertEqual(getattr(account, k), v)
 
-                # Verify Profile fields are populated
+        # Verify Profile fields are populated
         profile = Profile.objects.get(user=user)
         for k, v in self.profile_arguments.items():
             self.assertEqual(getattr(profile, k), v)
