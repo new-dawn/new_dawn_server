@@ -66,8 +66,21 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
             self.assertTrue(file.name.endswith(".png"))
             self.assertTrue(file.url.startswith("/media/images/test_"))
 
+            # Test GET API: will only get media path instead of file itself
+            res = self.api_client.get("/api/v1/image/", format="json")
+            res_data = json.loads(res.content)
+            image_data = res_data['objects'][0]
+            self.assertEquals(image_data["caption"], "good")
+            self.assertEquals(image_data["order"], 1)
+            self.assertTrue(image_data["media"].startswith("/media/images/test_"))
+            user_data = image_data["user"]
+            self.assertEquals(user_data["username"], "test-user")
+
             # Remove the uploaded file
-            os.remove(file.path)
+            try:
+                os.remove(file.path)
+            except OSError:
+                pass
 
 
 
