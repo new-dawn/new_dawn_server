@@ -1,7 +1,7 @@
 import json
 
 from django.test import TestCase
-from new_dawn_server.locations.constants import us_city_mapping, country_list
+from new_dawn_server.locations.constants.city_constants import US_CITY_MAPPING, COUNTRY_LIST
 from tastypie.test import ResourceTestCaseMixin
 
 
@@ -23,7 +23,7 @@ class CityMappingTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/city_preference/get_state_for_country/", format='json', data=self.country_testcase
         )
         res_data = json.loads(res.content)
-        self.assertEqual(res_data["state_list"], country_list["United States"])
+        self.assertEqual(res_data["state_list"], COUNTRY_LIST["United States"])
 
     def test_get_city_for_state(self):
         city_state_testcase = {**self.country_testcase, **self.state_testcase}
@@ -31,4 +31,4 @@ class CityMappingTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/city_preference/get_city_for_state/", format='json', data=city_state_testcase
         )
         res_data = json.loads(res.content)
-        self.assertEqual(res_data["city_list"], us_city_mapping["Utah"])
+        self.assertEqual(res_data["city_list"], US_CITY_MAPPING["Utah"])

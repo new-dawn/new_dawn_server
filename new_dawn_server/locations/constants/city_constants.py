@@ -1,4 +1,4 @@
-us_city_mapping = {
+US_CITY_MAPPING = {
     'Puerto Rico': ['Espino', 'AÌ±asco Zona Urbana', 'La Playa', 'Las Marias', 'Las MarÌ_as Comunidad', 'AÌ±asco',
                     'La Playa Comunidad', 'Espino Comunidad', 'Adjuntas', 'Adjuntas Zona Urbana', 'Aguada Zona Urbana',
                     'Luyando Comunidad', 'Aguada', 'Luyando', 'Rafael HernÌÁndez Comunidad', 'San Antonio Comunidad',
@@ -4906,4 +4906,4 @@ us_city_mapping = {
                      'Watch Hill'],
     'Virgin Islands': ['Frederiksted', 'Christiansted', 'Cruz Bay', 'Coral Bay', 'Charlotte Amalie', 'Tutu']}
 
-country_list = {'United States': ['Puerto Rico', 'South Carolina', 'Louisiana', 'Virginia', 'Idaho', 'Iowa', 'Oklahoma', 'Missouri', 'Kentucky', 'Washington', 'Wisconsin', 'North Dakota', 'Nebraska', 'Pennsylvania', 'Colorado', 'Illinois', 'Indiana', 'Ohio', 'Mississippi', 'Vermont', 'Minnesota', 'Florida', 'North Carolina', 'California', 'Wyoming', 'New York', 'Michigan', 'Alaska', 'Maryland', 'Kansas', 'Texas', 'Tennessee', 'Maine', 'Arizona', 'Georgia', 'Arkansas', 'New Jersey', 'South Dakota', 'Alabama', 'Oregon', 'West Virginia', 'Massachusetts', 'Utah', 'Montana', 'New Hampshire', 'New Mexico', 'Nevada', 'District of Columbia', 'Connecticut', 'Hawaii', 'Delaware', 'Rhode Island', 'Virgin Islands']}
+COUNTRY_LIST = {'United States': ['Puerto Rico', 'South Carolina', 'Louisiana', 'Virginia', 'Idaho', 'Iowa', 'Oklahoma', 'Missouri', 'Kentucky', 'Washington', 'Wisconsin', 'North Dakota', 'Nebraska', 'Pennsylvania', 'Colorado', 'Illinois', 'Indiana', 'Ohio', 'Mississippi', 'Vermont', 'Minnesota', 'Florida', 'North Carolina', 'California', 'Wyoming', 'New York', 'Michigan', 'Alaska', 'Maryland', 'Kansas', 'Texas', 'Tennessee', 'Maine', 'Arizona', 'Georgia', 'Arkansas', 'New Jersey', 'South Dakota', 'Alabama', 'Oregon', 'West Virginia', 'Massachusetts', 'Utah', 'Montana', 'New Hampshire', 'New Mexico', 'Nevada', 'District of Columbia', 'Connecticut', 'Hawaii', 'Delaware', 'Rhode Island', 'Virgin Islands']}
