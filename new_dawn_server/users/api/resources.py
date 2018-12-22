@@ -13,7 +13,12 @@ from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
-from tastypie.authentication import Authentication
+from tastypie.authentication import (
+    ApiKeyAuthentication,
+    Authentication,
+    BasicAuthentication,
+    MultiAuthentication
+)
 from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpForbidden, HttpNotAcceptable, HttpNoContent, HttpUnauthorized
@@ -65,7 +70,7 @@ authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
 class UserResource(ModelResource):
     class Meta:
         allowed_methods = ["get", "post"]
-        authentication = Authentication()
+        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         excludes = ["is_staff", "password"]
         filtering = {"username": "exact"}
@@ -193,7 +198,7 @@ class AccountResource(ModelResource):
     class Meta:
         allowed_methods = ["get"]
         always_return_data = True
-        authentication = Authentication()
+        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         queryset = Account.objects.all()
         resource_name = "account"
@@ -205,7 +210,7 @@ class ProfileResource(ModelResource):
 
     class Meta:
         allowed_methods = ["get"]
-        authentication = Authentication()
+        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         filtering = {
             'user': ALL_WITH_RELATIONS

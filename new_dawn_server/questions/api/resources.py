@@ -1,6 +1,12 @@
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.api.resources import UserResource
 from tastypie import fields
+from tastypie.authentication import (
+    ApiKeyAuthentication,
+    Authentication,
+    BasicAuthentication,
+    MultiAuthentication
+)
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 
@@ -18,6 +24,7 @@ QUESTION_FIELDS = {
 class QuestionResource(ModelResource):
     class Meta:
         always_return_data = True
+        authentication = Authentication()
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         filtering = {
@@ -33,6 +40,7 @@ class AnswerQuestionResource(ModelResource):
 
     class Meta:
         always_return_data = True
+        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         queryset = AnswerQuestion.objects.all()

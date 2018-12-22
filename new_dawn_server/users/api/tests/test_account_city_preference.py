@@ -100,9 +100,11 @@ class AccountCreateTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.city_preference_arguments
         }
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
-        res = self.api_client.get("/api/v1/account/", format="json")
+        res_data = json.loads(res.content)
+        api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
+        res = self.api_client.get("/api/v1/account/", format="json", authentication=api_credential)
         res_data = json.loads(res.content)
         for location in range(0, 2):
             for k, v in self.city_preference_arguments['city_preference'][location].items():

@@ -24,8 +24,11 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             "username": "test-user",
             "password": "test-pwd",
         }
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=self.register_argument)
+        res_data = json.loads(res.content)
+        self.basic_credential = self.create_basic(username=res_data["username"], password=res_data["password"])
+        self.api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
 
     def test_question_post_resource(self):
         self.assertEqual(Question.objects.count(), 0)
@@ -44,14 +47,16 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
     def test_question_get_resource(self):
         self.api_client.post(
             "/api/v1/question/", format="json", data=self.question_argument)
-        res = self.api_client.get("/api/v1/question/?user_defined=True", format="json")
+        res = self.api_client.get("/api/v1/question/?user_defined=True", format="json",
+                                  authentication=self.api_credential)
         res_data = json.loads(res.content)
         # Verify all the data gets populated
         for k, v in self.question_argument.items():
             self.assertTrue(k in res_data['objects'][0])
             self.assertTrue(v, res_data['objects'][0][k])
         # Verify user_defined filter is available
-        pre_defined_question_res = self.api_client.get("/api/v1/question/?user_defined=False", format="json")
+        pre_defined_question_res = self.api_client.get("/api/v1/question/?user_defined=False", format="json",
+                                                       authentication=self.api_credential)
         res_data = json.loads(pre_defined_question_res.content)
         self.assertEqual(len(res_data['objects']), 0)
 
@@ -65,10 +70,10 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             "question": "/api/v1/question/1/"
         }
         self.api_client.post(
-            "/api/v1/question/", format="json", data=self.question_argument)
+            "/api/v1/question/", format="json", data=self.question_argument, authentication=self.api_credential)
 
         res = self.api_client.post(
-            "/api/v1/answer_question/", format="json", data=all_arguments)
+            "/api/v1/answer_question/", format="json", data=all_arguments, authentication=self.api_credential)
         res_data = json.loads(res.content)
 
         for k, v in all_arguments.items():
@@ -101,11 +106,10 @@ class QuestionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/question/", format="json", data=self.question_argument)
 
         self.api_client.post(
-            "/api/v1/answer_question/", format="json", data=all_arguments)
+            "/api/v1/answer_question/", format="json", data=all_arguments, authentication=self.api_credential)
 
-        res = self.api_client.get("/api/v1/answer_question/", format="json")
+        res = self.api_client.get("/api/v1/answer_question/", format="json", authentication=self.api_credential)
         res_data = json.loads(res.content)
-
         # Verify Data were posted and getted correctly
         for k, v in self.register_argument.items():
             if k == "password":
