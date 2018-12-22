@@ -47,8 +47,9 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
 
         user = User.objects.get(username="test-user")
         res_data = json.loads(res.content)
-        res_data["username"] = self.register_arguments["username"]
-        res_data["token"] = user.api_key.key
+
+        self.assertEqual(res_data["username"], self.register_arguments["username"])
+        self.assertEqual(res_data["token"], user.api_key.key)
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)
