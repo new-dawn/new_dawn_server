@@ -3,6 +3,7 @@ from new_dawn_server.locations.constants.city_constants import US_CITY_MAPPING, 
 from new_dawn_server.locations.constants.college_constants import COLLEGE_NAMES
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.modules.client_response import ClientResponse
+from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.http import HttpBadRequest
 from tastypie.resources import ModelResource
@@ -11,6 +12,7 @@ from tastypie.resources import ModelResource
 class CityResource(ModelResource):
     class Meta:
         always_return_data = True
+        authentication = Authentication()
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         filtering = {

@@ -47,8 +47,9 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
 
         user = User.objects.get(username="test-user")
         res_data = json.loads(res.content)
-        res_data["username"] = self.register_arguments["username"]
-        res_data["token"] = user.api_key.key
+
+        self.assertEqual(res_data["username"], self.register_arguments["username"])
+        self.assertEqual(res_data["token"], user.api_key.key)
 
         # User, Account, Profile should be created together
         self.assertEqual(User.objects.count(), 1)
@@ -87,12 +88,14 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         }
 
         # Register a new account
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
 
         # Check login success
         res = self.api_client.post(
-            "/api/v1/user/login/", format="json", data=login_arguments)
+            "/api/v1/user/login/", format="json", data=login_arguments, authentication=api_credential)
 
         # Return success message and api-key
         res_data = json.loads(res.content)
@@ -107,10 +110,13 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
 
-        res = self.api_client.get("/api/v1/profile/", format="json", data={"username": "test-user"})
+        res = self.api_client.get("/api/v1/profile/", format="json", data={"username": "test-user"},
+                                  authentication=api_credential)
         res_data = json.loads(res.content)
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
@@ -121,10 +127,13 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
 
-        res = self.api_client.get("/api/v1/profile/?user__username=test-user", format="json")
+        res = self.api_client.get("/api/v1/profile/?user__username=test-user", format="json",
+                                  authentication=api_credential)
         res_data = json.loads(res.content)
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
@@ -170,8 +179,11 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
-        self.api_client.post(
+        res = self.api_client.post(
             "/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        self.api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
+
         self.api_client.post(
             "/api/v1/question/", format="json", data=self.question_argument_1)
         self.api_client.post(
@@ -189,9 +201,9 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
                 "question": f"/api/v1/question/{i}/",
             }
             self.api_client.post(
-                "/api/v1/answer_question/", format="json", data=one_time_arguments
+                "/api/v1/answer_question/", format="json", data=one_time_arguments, authentication=self.api_credential
             )
-        res = self.api_client.get("/api/v1/profile/", format="json")
+        res = self.api_client.get("/api/v1/profile/", format="json", authentication=self.api_credential)
         res_data = json.loads(res.content)
         for k, v in res_data['objects'][0].items():
             if k == "user":
