@@ -29,7 +29,7 @@ class AccountCreateTest(ResourceTestCaseMixin, TestCase):
             "job_title": "CEO",
             "profile_photo_url": "www",
             "school": "NYU",
-            "smoke": True,
+            "smoke": "Socially",
         }
         self.city_preference_arguments = {"city_preference":
             [

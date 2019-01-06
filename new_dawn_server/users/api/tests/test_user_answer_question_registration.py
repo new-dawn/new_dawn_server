@@ -28,7 +28,7 @@ class AnswerQuestionInRegisterTest(ResourceTestCaseMixin, TestCase):
             "job_title": "CEO",
             "profile_photo_url": "www",
             "school": "NYU",
-            "smoke": True,
+            "smoke": "Socially",
         }
         self.answer_question_arguments = {"answer_question":
             [
