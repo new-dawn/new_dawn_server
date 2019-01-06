@@ -24,13 +24,15 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "gender": "M",
         }
         self.profile_arguments = {
+            "degree": "high school",
             "description": "nice",
+            "drink": "NO",
             "employer": "MANMAN",
             "hometown": "NY",
             "job_title": "CEO",
             "profile_photo_url": "www",
             "school": "NYU",
-            "smoke": True,
+            "smoke": "Socially",
         }
 
     def test_register_success(self):
@@ -160,7 +162,7 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
             "job_title": "CEO",
             "profile_photo_url": "www",
             "school": "NYU",
-            "smoke": True,
+            "smoke": "Socially",
         }
         self.question_argument_1 = {
             "question": "How are you doing?",

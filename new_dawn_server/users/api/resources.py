@@ -50,7 +50,9 @@ ACCOUNT_FIELDS = {
 }
 
 PROFILE_FIELDS = {
+    "degree": False,
     "description": False,
+    "drink": False,
     "employer": False,
     "height": False,
     "hometown": False,

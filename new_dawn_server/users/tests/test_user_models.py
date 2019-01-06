@@ -42,14 +42,16 @@ class ProfileTest(TestCase):
         )
         self.profile = Profile.objects.create(
             account=Account.objects.get(name="testuser"),
+            degree="high school",
             description="Good Boy",
+            drink="NO",
             employer="ManMan",
             height=Decimal(180.00),
             hometown="Chongqing",
             job_title="Analyst",
             profile_photo_url="manman.com",
             school="NYU",
-            smoke="True",
+            smoke="Socially",
             user=User.objects.get(username="101010")
         )
         Question.objects.create(
@@ -92,9 +94,7 @@ class ProfileTest(TestCase):
         self.assertEqual(test_answer_questions[1].answer, "Good Good Bad")
 
     def test_profile_boolean_fields(self):
-        test_user_account = Account.objects.get(name="testuser")
-        test_user_profile = Profile.objects.get(account=test_user_account)
-        self.assertEqual(test_user_profile.smoke, True)
+        return
 
     def test_profile_char_fields(self):
         test_user_account = Account.objects.get(name="testuser")
@@ -105,6 +105,9 @@ class ProfileTest(TestCase):
         self.assertEqual(test_user_profile.job_title, "Analyst")
         self.assertEqual(test_user_profile.profile_photo_url, "manman.com")
         self.assertEqual(test_user_profile.school, "NYU")
+        self.assertEqual(test_user_profile.drink, "NO")
+        self.assertEqual(test_user_profile.smoke, "Socially")
+        self.assertEqual(test_user_profile.degree, "high school")
 
     def test_profile_decimal_fields(self):
         test_user_account = Account.objects.get(name="testuser")
