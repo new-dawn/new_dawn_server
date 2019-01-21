@@ -49,6 +49,7 @@ class Command(BaseCommand):
         self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl1.jpg", 0)
         self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl2.jpg", 0)
         self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl3.jpg", 0)
+        # TODO: Create some question answers here
 
     def create_test_user_2(self):
         # Always re-create the test user
@@ -80,6 +81,7 @@ class Command(BaseCommand):
         )
         self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl4.jpg", 0)
         self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl5.jpg", 0)
+        # TODO: Create some question answers here
 
     def handle(self, *args, **options):
         print("Create Test User 1")
