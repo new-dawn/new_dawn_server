@@ -9,8 +9,9 @@
 5. Run `pip3 install -r requirements.txt` to install dependencies
 
 ## Run Server & Test API
-1. Run local server `python3 manage.py runserver`.
-2. In another terminal session, use `curl` to GET/POST your request.
+1. Run local server `./runserver`. This will go through some environment setup.
+2. Get the testing username and apikey from the output. This should be used in your iOS code to test backend requests.
+3. In another terminal session, use `curl` to GET/POST your request.
 
 ### Example
 * Registration

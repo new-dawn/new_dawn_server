@@ -11,3 +11,6 @@ class Command(BaseCommand):
 			if not User.objects.filter(username=username).exists():
 				User.objects.create_superuser(
 					username, os.environ['SUPER_USER_EMAIL'], os.environ['SUPER_USER_PASSWORD'])
+			admin_user = User.objects.get(username=username)
+			print("Super User Created: " + admin_user.username)
+			print("Api-Key: " + admin_user.api_key.key)
