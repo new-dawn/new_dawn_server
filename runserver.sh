@@ -15,6 +15,7 @@ python3 manage.py migrate
 
 echo "--- Pre-run Commands"
 python3 manage.py create_super_user
+python3 manage.py create_test_users
 
 echo "--- Run Server"
 python3 manage.py runserver
