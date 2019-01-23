@@ -212,7 +212,8 @@ class ProfileResource(ModelResource):
 
     class Meta:
         allowed_methods = ["get"]
-        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
+        # TODO: Remove Authentication once profile main page is developed
+        authentication = MultiAuthentication(Authentication(), BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         filtering = {
             'user': ALL_WITH_RELATIONS
