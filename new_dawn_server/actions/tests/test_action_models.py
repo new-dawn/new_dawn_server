@@ -36,7 +36,6 @@ class LikeTest(TestCase):
         self.assertEqual(test_like_obj.like_metadata.entity_id, 1)
         self.assertEqual(test_like_obj.like_metadata.entity_type, EntityType.MAIN_IMAGE.value)
 
-
     def test_get_multiple_user_likes(self):
         Account.objects.create(
             birthday="1995-01-01",
