@@ -2,6 +2,8 @@ from django.db import models
 
 
 class UserToUserActionMetadata(models.Model):
+    entity_id = models.IntegerField(blank=True, null=True)
+    entity_type = models.IntegerField(blank=True, null=True)
     user_account_from = models.ForeignKey("users.Account",
                                           on_delete=models.CASCADE, related_name="from_user")
     user_account_to = models.ForeignKey("users.Account", on_delete=models.CASCADE,
