@@ -18,8 +18,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from new_dawn_server.actions.api.resources import (
-    ActionMetaResource,
-    LikeResouce
+    UserActionResource
 )
 from new_dawn_server.locations.api.resources import (
     CityResource
@@ -43,12 +42,11 @@ from tastypie.api import Api
 v1_api = Api(api_name='v1')
 v1_api.register(AccountResource())
 v1_api.register(AnswerQuestionResource())
-v1_api.register(ActionMetaResource())
 v1_api.register(CityResource())
 v1_api.register(ImageResource())
-v1_api.register(LikeResouce())
 v1_api.register(ProfileResource())
 v1_api.register(QuestionResource())
+v1_api.register(UserActionResource())
 v1_api.register(UserRegisterResource())
 v1_api.register(UserResource())
 

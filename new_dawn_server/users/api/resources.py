@@ -200,10 +200,13 @@ class AccountResource(ModelResource):
     class Meta:
         allowed_methods = ["get"]
         always_return_data = True
-        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
+        authentication = Authentication()
         authorization = Authorization()
         queryset = Account.objects.all()
         resource_name = "account"
+        filtering = {
+            "name": ALL_WITH_RELATIONS
+        }
 
 
 class ProfileResource(ModelResource):
@@ -339,7 +342,6 @@ class UserRegisterResource(ModelResource):
 
             city_preference_ls = self.get_and_save_city_pref(bundle)
             account.city_preference.set(city_preference_ls)
-
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
