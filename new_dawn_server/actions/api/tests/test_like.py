@@ -88,6 +88,13 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/user_action/", format="json", data=self.like_argument
         )
         res_data = json.loads(res.content)
+        # Check post response
+        for k, v in self.like_argument.items():
+            if k == "user_account_from" or k == "user_account_to":
+                self.assertEqual(res_data[k]["resource_uri"], self.like_argument[k])
+            else:
+                self.assertEqual(res_data[k], self.like_argument[k])
+        # Check creation of objects
         self.assertEqual(Account.objects.count(), 2)
         self.assertEqual(UserAction.objects.count(), 1)
         test_like_object = UserAction.objects.get(user_account_from__profile__user_id=1)

@@ -195,7 +195,7 @@ class UserResource(ModelResource):
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
-    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True, null=True)
 
     class Meta:
         allowed_methods = ["get"]
