@@ -3,6 +3,7 @@ import os
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from new_dawn_server.medias.models import Image
+from new_dawn_server.questions.models import Question, AnswerQuestion
 from new_dawn_server.users.models import Account, Profile
 
 
@@ -17,14 +18,31 @@ class Command(BaseCommand):
             update_time = "2018-01-01",
             user=user,
         )
+        return img
+
+    def create_test_answer_questions(self, user, profile, question, answer, order):
+        question_obj = Question.objects.get_or_create(question=question)
+        answer = AnswerQuestion.objects.create(
+            answer=answer, 
+            order=order,
+            profile=profile,
+            question=question_obj[0],
+            user=user,
+        )
+        return answer
 
     def create_test_user_1(self):
         # Always re-create the test user
         User.objects.filter(username="testuser1").delete()
         test_user = User.objects.create_user(
-            username="testuser1", email="test@gmail.com", password="testuser1")
+            first_name="Tracy",
+            last_name="Wang",
+            username="testuser1", 
+            email="test@gmail.com", 
+            password="testuser1"
+        )
         test_account = Account.objects.create(
-            birthday="2018-01-01",
+            birthday="2000-03-01",
             creation_date="2018-01-01",
             gender="M",
             name="test_user_1",
@@ -46,18 +64,32 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl1.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl2.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl3.jpg", 0)
-        # TODO: Create some question answers here
+
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 11", "images/testgirl1.jpeg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 12", "images/testgirl2.jpg", 1))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 13", "images/testgirl3.jpg", 2))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 14", "images/testgirl4.jpg", 3))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 15", "images/testgirl5.jpg", 4))
+        
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "What's your best movie?", "Inception", 0))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "What's your first toy?", "A Doll", 1))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "What's your total GPA?", "3.92", 2))
 
     def create_test_user_2(self):
         # Always re-create the test user
         User.objects.filter(username="testuser2").delete()
         test_user = User.objects.create_user(
-            username="testuser2", email="test2@gmail.com", password="testuser2")
+            first_name="Max",
+            last_name="Zhang",
+            username="testuser2", 
+            email="test2@gmail.com", 
+            password="testuser2"
+        )
         test_account = Account.objects.create(
-            birthday="2018-01-01",
+            birthday="1991-01-11",
             creation_date="2018-01-01",
             gender="F",
             name="test_user_2",
@@ -79,9 +111,17 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl4.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl5.jpg", 0)
-        # TODO: Create some question answers here
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 21", "images/testgirl6.png", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 22", "images/testgirl7.jpg", 1))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 23", "images/testgirl8.jpg", 2))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 24", "images/testgirl9.jpg", 3))
+        
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "What's your 2019 resolution?", "Build a tower", 0))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "Who's your icon?", "Kevin", 1))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "Where were you born?", "New York", 2))
 
     def handle(self, *args, **options):
         print("Create Test User 1")

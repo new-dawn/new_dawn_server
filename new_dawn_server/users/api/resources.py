@@ -1,4 +1,5 @@
 from authy.api import AuthyApiClient
+from datetime import date
 from django import forms
 from django.conf import settings
 from django.conf.urls import url
@@ -212,7 +213,17 @@ class AccountResource(ModelResource):
 class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
-
+    images = fields.ToManyField(
+        "new_dawn_server.medias.api.resources.ImageResource", 
+        "image_set", related_name="profile", full=True, null=True
+    )
+    answer_questions = fields.ToManyField(
+        "new_dawn_server.questions.api.resources.AnswerQuestionResource", 
+        "answerquestion_set", 
+        related_name="profile",
+        full=True, 
+        null=True
+    )
     class Meta:
         allowed_methods = ["get"]
         # TODO: Remove Authentication once profile main page is developed
@@ -225,24 +236,16 @@ class ProfileResource(ModelResource):
         resource_name = "profile"
 
     @staticmethod
-    def _get_all_questions_answers(answer_question_obj):
-        result_list = []
-        for answer_question in answer_question_obj:
-            one_question_answer_dict = {
-                'question': answer_question.question.question,
-                'answer': answer_question.answer,
-                'order': answer_question.order,
-                "update_time": answer_question.update_time,
-            }
-            result_list.append(one_question_answer_dict)
-        return result_list
+    def _get_age(birthday):
+        if birthday:
+            today = date.today()
+            return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+        else:
+            return None
 
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
-        user_id = bundle.data['user'].data['id']
-        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
-        answer_question_lists = self._get_all_questions_answers(answer_question_obj)
-        bundle.data['answer_question'] = answer_question_lists
+        bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
         return bundle
 
 
