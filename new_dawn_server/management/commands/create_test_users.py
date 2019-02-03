@@ -52,7 +52,7 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 11", "images/testgirl1.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 11", "images/testgirl1.jpeg", 0))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 12", "images/testgirl2.jpg", 0))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 13", "images/testgirl3.jpg", 0))
         # TODO: Create some question answers here
