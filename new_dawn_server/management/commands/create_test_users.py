@@ -68,6 +68,8 @@ class Command(BaseCommand):
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 11", "images/testgirl1.jpeg", 0))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 12", "images/testgirl2.jpg", 0))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 13", "images/testgirl3.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 14", "images/testgirl4.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 15", "images/testgirl5.jpg", 0))
         
         test_profile.answerquestion_set.add(
             self.create_test_answer_questions(test_user, test_profile, "What's your best movie?", "Inception", 0))
@@ -109,8 +111,10 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 21", "images/testgirl4.jpg", 0))
-        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 22", "images/testgirl5.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 21", "images/testgirl6.png", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 22", "images/testgirl7.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 23", "images/testgirl8.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 24", "images/testgirl9.jpg", 0))
         
         test_profile.answerquestion_set.add(
             self.create_test_answer_questions(test_user, test_profile, "What's your 2019 resolution?", "Build a tower", 0))
