@@ -17,6 +17,7 @@ class Command(BaseCommand):
             update_time = "2018-01-01",
             user=user,
         )
+        return img
 
     def create_test_user_1(self):
         # Always re-create the test user
@@ -51,9 +52,9 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl1.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl2.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 1", "images/testgirl3.jpg", 0)
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 11", "images/testgirl1.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 12", "images/testgirl2.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 13", "images/testgirl3.jpg", 0))
         # TODO: Create some question answers here
 
     def create_test_user_2(self):
@@ -89,8 +90,8 @@ class Command(BaseCommand):
             update_time="2018-01-01",
             user=test_user,
         )
-        self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl4.jpg", 0)
-        self.create_test_image(test_user, test_profile, "Test Image 2", "images/testgirl5.jpg", 0)
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 21", "images/testgirl4.jpg", 0))
+        test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 22", "images/testgirl5.jpg", 0))
         # TODO: Create some question answers here
 
     def handle(self, *args, **options):
