@@ -214,8 +214,16 @@ class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
     images = fields.ToManyField(
-        "new_dawn_server.medias.api.resources.ImageResource", "image_set", related_name="profile", full=True, null=True)
-
+        "new_dawn_server.medias.api.resources.ImageResource", 
+        "image_set", related_name="profile", full=True, null=True
+    )
+    answer_questions = fields.ToManyField(
+        "new_dawn_server.questions.api.resources.AnswerQuestionResource", 
+        "answer_question_set", 
+        related_name="profile",
+        full=True, 
+        null=True
+    )
     class Meta:
         allowed_methods = ["get"]
         # TODO: Remove Authentication once profile main page is developed
@@ -228,7 +236,8 @@ class ProfileResource(ModelResource):
         resource_name = "profile"
 
     @staticmethod
-    def _get_all_questions_answers(answer_question_obj):
+    def _get_all_questions_answers(user_id):
+        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
         result_list = []
         for answer_question in answer_question_obj:
             one_question_answer_dict = {
@@ -250,10 +259,9 @@ class ProfileResource(ModelResource):
 
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
-        user_id = bundle.data['user'].data['id']
-        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
-        answer_question_lists = self._get_all_questions_answers(answer_question_obj)
-        bundle.data['answer_question'] = answer_question_lists
+        # user_id = bundle.data['user'].data['id']
+        # answer_question_lists = self._get_all_questions_answers(user_id)
+        # bundle.data['answer_questions'] = answer_question_lists
         bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
         return bundle
 
