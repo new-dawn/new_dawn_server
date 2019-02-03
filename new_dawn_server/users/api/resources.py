@@ -219,7 +219,7 @@ class ProfileResource(ModelResource):
     )
     answer_questions = fields.ToManyField(
         "new_dawn_server.questions.api.resources.AnswerQuestionResource", 
-        "answer_question_set", 
+        "answerquestion_set", 
         related_name="profile",
         full=True, 
         null=True
@@ -234,20 +234,6 @@ class ProfileResource(ModelResource):
         }
         queryset = Profile.objects.all()
         resource_name = "profile"
-
-    @staticmethod
-    def _get_all_questions_answers(user_id):
-        answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
-        result_list = []
-        for answer_question in answer_question_obj:
-            one_question_answer_dict = {
-                'question': answer_question.question.question,
-                'answer': answer_question.answer,
-                'order': answer_question.order,
-                "update_time": answer_question.update_time,
-            }
-            result_list.append(one_question_answer_dict)
-        return result_list
 
     @staticmethod
     def _get_age(birthday):
