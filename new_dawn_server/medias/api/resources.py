@@ -6,6 +6,7 @@ from django.utils.datastructures import MultiValueDict
 from new_dawn_server.medias.models import Image
 from new_dawn_server.users.models import Profile
 from new_dawn_server.users.api.resources import UserResource
+from new_dawn_server.users.api.resources import ProfileResource
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
@@ -28,7 +29,8 @@ class MultipartResource(object):
 
 
 class ImageResource(MultipartResource, ModelResource):
-    user = fields.ToOneField(UserResource, "user", related_name="image", full=True)
+    user = fields.ForeignKey(UserResource, "user", related_name="images", full=True)
+    # profile = fields.ForeignKey(ProfileResource, "profile", related_name="images", full=True)
     media = fields.FileField(attribute="media")
     class Meta:
         always_return_data = True

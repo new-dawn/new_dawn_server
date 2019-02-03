@@ -9,7 +9,6 @@ from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
-from new_dawn_server.medias.api.resources import ImageResource
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
@@ -197,7 +196,7 @@ class UserResource(ModelResource):
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
-    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True, null=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference_set", related_name="account", full=True, null=True)
 
     class Meta:
         allowed_methods = ["get"]
@@ -214,7 +213,8 @@ class AccountResource(ModelResource):
 class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
-    image = fields.ManyToManyField(ImageResource, "image", related_name="profile", full=True)
+    images = fields.ToManyField(
+        "new_dawn_server.medias.api.resources.ImageResource", "image_set", related_name="profile", full=True, null=True)
 
     class Meta:
         allowed_methods = ["get"]
