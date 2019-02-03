@@ -22,9 +22,14 @@ class Command(BaseCommand):
         # Always re-create the test user
         User.objects.filter(username="testuser1").delete()
         test_user = User.objects.create_user(
-            username="testuser1", email="test@gmail.com", password="testuser1")
+            first_name="Tracy",
+            last_name="Wang",
+            username="testuser1", 
+            email="test@gmail.com", 
+            password="testuser1"
+        )
         test_account = Account.objects.create(
-            birthday="2018-01-01",
+            birthday="2000-03-01",
             creation_date="2018-01-01",
             gender="M",
             name="test_user_1",
@@ -55,9 +60,14 @@ class Command(BaseCommand):
         # Always re-create the test user
         User.objects.filter(username="testuser2").delete()
         test_user = User.objects.create_user(
-            username="testuser2", email="test2@gmail.com", password="testuser2")
+            first_name="Max",
+            last_name="Zhang",
+            username="testuser2", 
+            email="test2@gmail.com", 
+            password="testuser2"
+        )
         test_account = Account.objects.create(
-            birthday="2018-01-01",
+            birthday="1991-01-11",
             creation_date="2018-01-01",
             gender="F",
             name="test_user_2",
