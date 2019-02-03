@@ -1,4 +1,5 @@
 from authy.api import AuthyApiClient
+from datetime import date
 from django import forms
 from django.conf import settings
 from django.conf.urls import url
@@ -8,6 +9,7 @@ from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
+from new_dawn_server.medias.api.resources import ImageResource
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
@@ -212,6 +214,7 @@ class AccountResource(ModelResource):
 class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
+    image = fields.ManyToManyField(ImageResource, "image", related_name="profile", full=True)
 
     class Meta:
         allowed_methods = ["get"]
@@ -237,12 +240,21 @@ class ProfileResource(ModelResource):
             result_list.append(one_question_answer_dict)
         return result_list
 
+    @staticmethod
+    def _get_age(birthday):
+        if birthday:
+            today = date.today()
+            return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+        else:
+            return None
+
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
         user_id = bundle.data['user'].data['id']
         answer_question_obj = AnswerQuestion.objects.filter(user_id=user_id)
         answer_question_lists = self._get_all_questions_answers(answer_question_obj)
         bundle.data['answer_question'] = answer_question_lists
+        bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
         return bundle
 
 

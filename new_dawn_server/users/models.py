@@ -26,7 +26,7 @@ class Profile(models.Model):
     description = models.CharField(blank=True, max_length=200, null=True)
     drink = models.CharField(blank=True, max_length=50, null=True)
     employer = models.CharField(blank=True, max_length=50, null=True)
-    height = models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)
+    height = models.IntegerField(blank=True, null=True)
     hometown = models.CharField(blank=True, max_length=50, null=True)
     job_title = models.CharField(blank=True, max_length=50, null=True)
     profile_photo_url = models.CharField(blank=True, max_length=50, null=True)
