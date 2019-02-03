@@ -196,7 +196,7 @@ class UserResource(ModelResource):
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
-    city_preference = fields.ManyToManyField(CityResource, "city_preference_set", related_name="account", full=True, null=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True, null=True)
 
     class Meta:
         allowed_methods = ["get"]
@@ -259,9 +259,6 @@ class ProfileResource(ModelResource):
 
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
-        # user_id = bundle.data['user'].data['id']
-        # answer_question_lists = self._get_all_questions_answers(user_id)
-        # bundle.data['answer_questions'] = answer_question_lists
         bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
         return bundle
 

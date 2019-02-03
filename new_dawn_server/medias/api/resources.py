@@ -30,7 +30,6 @@ class MultipartResource(object):
 
 class ImageResource(MultipartResource, ModelResource):
     user = fields.ForeignKey(UserResource, "user", related_name="images", full=True)
-    # profile = fields.ForeignKey(ProfileResource, "profile", related_name="images", full=True)
     media = fields.FileField(attribute="media")
     class Meta:
         always_return_data = True
