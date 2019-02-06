@@ -79,8 +79,8 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "action_type": ActionType.LIKE.value,
             "entity_id": 1,
             "entity_type": EntityType.MAIN_IMAGE.value,
-            "user_account_from": "/api/v1/account/1/",
-            "user_account_to": "/api/v1/account/2/"
+            "user_account_from": "1",
+            "user_account_to": "2"
         }
 
     def test_like_user(self):
@@ -91,7 +91,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         # Check post response
         for k, v in self.like_argument.items():
             if k == "user_account_from" or k == "user_account_to":
-                self.assertEqual(res_data[k]["resource_uri"], self.like_argument[k])
+                self.assertEqual(res_data[k]["resource_uri"], "/api/v1/account/" + self.like_argument[k] + "/")
             else:
                 self.assertEqual(res_data[k], self.like_argument[k])
         # Check creation of objects

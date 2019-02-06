@@ -27,3 +27,11 @@ class UserActionResource(ModelResource):
             "user_account_from": ALL_WITH_RELATIONS,
             "user_account_to": ALL_WITH_RELATIONS,
         }
+
+    def hydrate_user_account_from(self, bundle):
+        bundle.data["user_account_from"] = "/api/v1/account/" + bundle.data["user_account_from"] + "/"
+        return bundle
+
+    def hydrate_user_account_to(self, bundle):
+        bundle.data["user_account_to"] = "/api/v1/account/" + bundle.data["user_account_to"] + "/"
+        return bundle
