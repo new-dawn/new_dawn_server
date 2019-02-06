@@ -35,3 +35,4 @@ class UserActionResource(ModelResource):
     def hydrate_user_account_to(self, bundle):
         bundle.data["user_account_to"] = "/api/v1/account/" + bundle.data["user_account_to"] + "/"
         return bundle
+
