@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from new_dawn_server.actions.constants import ActionType, EntityType
 from new_dawn_server.actions.models import UserAction
-from new_dawn_server.users.models import Account
 from tastypie.test import ResourceTestCaseMixin
 
 
@@ -79,8 +78,8 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "action_type": ActionType.LIKE.value,
             "entity_id": 1,
             "entity_type": EntityType.MAIN_IMAGE.value,
-            "user_account_from": "1",
-            "user_account_to": "2"
+            "user_from": "1",
+            "user_to": "2"
         }
 
     def test_like_user(self):
@@ -90,15 +89,15 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         res_data = json.loads(res.content)
         # Check post response
         for k, v in self.like_argument.items():
-            if k == "user_account_from" or k == "user_account_to":
-                self.assertEqual(res_data[k]["resource_uri"], "/api/v1/account/" + self.like_argument[k] + "/")
+            if k == "user_from" or k == "user_to":
+                self.assertEqual(res_data[k]["resource_uri"], "/api/v1/user/" + self.like_argument[k] + "/")
             else:
                 self.assertEqual(res_data[k], self.like_argument[k])
         # Check creation of objects
-        self.assertEqual(Account.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 2)
         self.assertEqual(UserAction.objects.count(), 1)
-        test_like_object = UserAction.objects.get(user_account_from__profile__user_id=1)
+        test_like_object = UserAction.objects.get(user_from__profile__user_id=1)
         self.assertEqual(test_like_object.action_type, ActionType.LIKE.value)
         self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
         self.assertEqual(test_like_object.entity_id, 1)
-        self.assertEqual(test_like_object.user_account_to.name, "test2_user2")
+        self.assertEqual(test_like_object.user_to.username, "duck2")

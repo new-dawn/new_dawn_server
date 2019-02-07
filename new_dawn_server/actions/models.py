@@ -1,12 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class UserAction(models.Model):
     action_type = models.IntegerField(blank=True, null=True)
     entity_id = models.IntegerField(blank=True, null=True)
     entity_type = models.IntegerField(blank=True, null=True)
-    user_account_from = models.ForeignKey("users.Account",
-                                          on_delete=models.CASCADE, related_name="from_user")
-    user_account_to = models.ForeignKey("users.Account", on_delete=models.CASCADE,
-                                        related_name="to_user")
+    user_from = models.ForeignKey(User,
+                                  on_delete=models.CASCADE, related_name="from_user", blank=True, null=True)
+    user_to = models.ForeignKey(User, on_delete=models.CASCADE,
+                                related_name="to_user", blank=True, null=True)
     update_time = models.DateTimeField(auto_now_add=True)
