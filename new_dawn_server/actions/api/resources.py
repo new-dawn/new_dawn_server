@@ -1,3 +1,4 @@
+from django.conf.urls import url
 from new_dawn_server.actions.models import UserAction
 from new_dawn_server.users.api.resources import UserResource
 from tastypie import fields
@@ -28,6 +29,11 @@ class UserActionResource(ModelResource):
             "user_to": ALL_WITH_RELATIONS,
         }
 
+    def prepend_urls(self):
+        return [
+            url(r"^user_action/send_message/$", self.wrap_view("send_message"), name="api_send_message"),
+        ]
+
     def hydrate_user_from(self, bundle):
         bundle.data["user_from"] = "/api/v1/user/" + bundle.data["user_from"] + "/"
         return bundle
@@ -35,3 +41,9 @@ class UserActionResource(ModelResource):
     def hydrate_user_to(self, bundle):
         bundle.data["user_to"] = "/api/v1/user/" + bundle.data["user_to"] + "/"
         return bundle
+
+    def send_message(self, request, **kwargs):
+        self.method_check(request, allowed=["post"])
+        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
+        user_id_me = data.get("user_id_me", "")
+        user_id_you = data.get("user_id_you", "")
