@@ -96,7 +96,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         # Check creation of objects
         self.assertEqual(User.objects.count(), 2)
         self.assertEqual(UserAction.objects.count(), 1)
-        test_like_object = UserAction.objects.get(user_from__profile__user_id=1)
+        test_like_object = UserAction.objects.get(user_from__id=1)
         self.assertEqual(test_like_object.action_type, ActionType.LIKE.value)
         self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
         self.assertEqual(test_like_object.entity_id, 1)
