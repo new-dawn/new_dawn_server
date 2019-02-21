@@ -31,6 +31,7 @@ class UserActionResource(ModelResource):
         filtering = {
             "user_from": ALL_WITH_RELATIONS,
             "user_to": ALL_WITH_RELATIONS,
+            "message": ALL_WITH_RELATIONS,
         }
 
     def prepend_urls(self):

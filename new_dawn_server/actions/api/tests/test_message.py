@@ -93,9 +93,15 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         # Check creation of objects
         self.assertEqual(User.objects.count(), 2)
         self.assertEqual(UserAction.objects.count(), 1)
-        test_like_object = UserAction.objects.get(user_from__profile__user_id=1)
+        test_like_object = UserAction.objects.get(user_from__id=1)
         self.assertEqual(test_like_object.action_type, ActionType.MESSAGE.value)
         self.assertEqual(test_like_object.entity_type, EntityType.NONE.value)
         self.assertEqual(test_like_object.entity_id, 1)
         self.assertEqual(test_like_object.user_to.username, "duck2")
         self.assertEqual(test_like_object.message, "How are you")
+        # Test GET API for sender's message
+        res = self.api_client.get(
+            "/api/v1/user_action/?user_from__id=1", format="json"
+        )
+        res_data = json.loads(res.content)
+        self.assertEqual(res_data["objects"][0]["message"], "How are you")
