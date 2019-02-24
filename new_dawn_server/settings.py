@@ -140,3 +140,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 # Authy Application Key
 ACCOUNT_SECURITY_API_KEY = os.environ.get('ACCOUNT_SECURITY_API_KEY')
+
+# Pusher Application Key
+PUSHER_APP_KEY=os.environ.get('PUSHER_APP_KEY')
+PUSHER_APP_SECRET=os.environ.get('PUSHER_APP_SECRET')
+PUSHER_APP_ID=os.environ.get('PUSHER_APP_ID')
+PUSHER_CLUSTER=os.environ.get('PUSHER_CLUSTER')

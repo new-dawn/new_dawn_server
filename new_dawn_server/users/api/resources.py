@@ -76,7 +76,7 @@ class UserResource(ModelResource):
         authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         excludes = ["is_staff", "password"]
-        filtering = {"username": "exact"}
+        filtering = {"username": "exact", "id": "exact"}
         queryset = User.objects.all()
         resource_name = "user"
 
