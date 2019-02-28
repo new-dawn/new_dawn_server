@@ -1,9 +1,13 @@
 import datetime
 import json
+import os
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
+from django.db.models.fields.files import ImageFieldFile
 from django.test import TestCase
+from new_dawn_server.medias.models import Image
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie.test import ResourceTestCaseMixin
@@ -33,6 +37,26 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "profile_photo_url": "www",
             "school": "NYU",
             "smoke": "Socially",
+        }
+        image1 = SimpleUploadedFile("media/images/test.png", b"file_content", content_type="image/png")
+        image2 = SimpleUploadedFile("media/images/testcat.JPG", b"file_content", content_type="image/jpg")
+        self.image_arguments = {
+            "images": [
+                {
+                    "caption": "no",
+                    "media": image1,
+                    "order": 1,
+                    "profile": "/api/v1/profile/1/",
+                    "user": "/api/v1/user/1/"
+                },
+                {
+                    "caption": "no",
+                    "media": image2,
+                    "order": 2,
+                    "profile": "/api/v1/profile/1/",
+                    "user": "/api/v1/user/1/"
+                }
+            ]
         }
 
     def test_register_success(self):
@@ -143,6 +167,40 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
+    def test_register_with_images(self):
+        self.assertEqual(Image.objects.count(), 0)
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments,
+            **self.image_arguments
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=all_arguments)
+
+        # Creation of image objects
+        self.assertEqual(Image.objects.count(), 2)
+
+        # Test first image object
+        image_first_obj = Image.objects.all()[0]
+        self.assertEqual(image_first_obj.caption, "no")
+        self.assertEqual(image_first_obj.order, 1)
+        self.assertEqual(image_first_obj.user.id, 1)
+        self.assertEqual(image_first_obj.profile.id, 1)
+
+        # Test the image file
+        file = image_first_obj.media
+        self.assertTrue(isinstance(file, ImageFieldFile))
+        self.assertTrue(file.name.startswith("test"))
+        self.assertTrue(file.name.endswith(".png"))
+        self.assertTrue(file.url.startswith("/media/test"))
+
+        # Remove the uploaded file
+        try:
+            os.remove(file.path)
+        except OSError:
+            pass
+
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
@@ -219,3 +277,7 @@ class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
                 for each in v:
                     self.assertTrue(each['answer'], "niu")
                     self.assertTrue(each['order'], question_order)
+
+    # def test_register_with_images(self):
+    #
+    #
