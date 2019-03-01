@@ -3,6 +3,7 @@ from django.db import models
 
 from new_dawn_server.users.models import Profile
 
+
 class Image(models.Model):
     caption = models.CharField(blank=True, max_length=200, null=True)
     media = models.ImageField(upload_to='images/')

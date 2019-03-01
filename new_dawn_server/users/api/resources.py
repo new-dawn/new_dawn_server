@@ -196,7 +196,8 @@ class UserResource(ModelResource):
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
-    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True, null=True)
+    city_preference = fields.ManyToManyField(CityResource, "city_preference", related_name="account", full=True,
+                                             null=True)
 
     class Meta:
         allowed_methods = ["get"]
@@ -214,16 +215,17 @@ class ProfileResource(ModelResource):
     account = fields.ToOneField(AccountResource, "account", related_name="profile", full=True)
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
     images = fields.ToManyField(
-        "new_dawn_server.medias.api.resources.ImageResource", 
+        "new_dawn_server.medias.api.resources.ImageResource",
         "image_set", related_name="profile", full=True, null=True
     )
     answer_questions = fields.ToManyField(
-        "new_dawn_server.questions.api.resources.AnswerQuestionResource", 
-        "answerquestion_set", 
+        "new_dawn_server.questions.api.resources.AnswerQuestionResource",
+        "answerquestion_set",
         related_name="profile",
-        full=True, 
+        full=True,
         null=True
     )
+
     class Meta:
         allowed_methods = ["get"]
         # TODO: Remove Authentication once profile main page is developed
@@ -353,7 +355,6 @@ class UserRegisterResource(ModelResource):
             profile.save()
 
             self.get_and_save_answer_question(bundle, user_bundle.obj, profile)
-
         return bundle
 
     def dehydrate(self, bundle):
