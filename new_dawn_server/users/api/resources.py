@@ -9,7 +9,6 @@ from django.db import transaction
 from django.db.models import signals
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
-from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
@@ -329,20 +328,6 @@ class UserRegisterResource(ModelResource):
                 )
                 answer_question.save()
 
-    @staticmethod
-    def get_and_save_images(bundle, user, profile):
-        images_bundle = bundle.data.get("images")
-        if images_bundle:
-            for single_image_bundle in images_bundle:
-                image_data = Image(
-                    caption=single_image_bundle["caption"],
-                    media=single_image_bundle["media"],
-                    order=single_image_bundle["order"],
-                    profile=profile,
-                    user=user
-                )
-                image_data.save()
-
     def obj_create(self, bundle, **kwargs):
         """
         Override obj_create method to create related models
@@ -370,7 +355,6 @@ class UserRegisterResource(ModelResource):
             profile.save()
 
             self.get_and_save_answer_question(bundle, user_bundle.obj, profile)
-            self.get_and_save_images(bundle, user_bundle.obj, profile)
         return bundle
 
     def dehydrate(self, bundle):
