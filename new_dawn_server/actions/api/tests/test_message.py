@@ -157,18 +157,18 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         )
         res_data = json.loads(res.content)
         self.assertEqual(len(res_data["objects"]), 2)
-        res_data["objects"][0]["user_from"] = 1
-        res_data["objects"][0]["user_to"] = 2
-        res_data["objects"][0]["message"] = "How are you"
-        res_data["objects"][1]["user_from"] = 2
-        res_data["objects"][1]["user_to"] = 1
-        res_data["objects"][1]["message"] = "I'm good"
+        self.assertEqual(res_data["objects"][0]["user_from"], 1)
+        self.assertEqual(res_data["objects"][0]["user_to"], 2)
+        self.assertEqual(res_data["objects"][0]["message"], "How are you")
+        self.assertEqual(res_data["objects"][1]["user_from"], 2)
+        self.assertEqual(res_data["objects"][1]["user_to"], 1)
+        self.assertEqual(res_data["objects"][1]["message"], "I'm good")
 
         res = self.api_client.get(
             "/api/v1/user_action/get_messages/?user_from=2&user_to=3", format="json"
         )
         res_data = json.loads(res.content)
         self.assertEqual(len(res_data["objects"]), 1)
-        res_data["objects"][0]["user_from"] = 2
-        res_data["objects"][0]["user_to"] = 3
-        res_data["objects"][0]["message"] = "Nice to meet you"
+        self.assertEqual(res_data["objects"][0]["user_from"], 2)
+        self.assertEqual(res_data["objects"][0]["user_to"], 3)
+        self.assertEqual(res_data["objects"][0]["message"], "Nice to meet you")

@@ -79,8 +79,8 @@ class UserActionResource(ModelResource):
         result = []
         for message_action in messages:
             result.append({
-                "user_from": message_action.user_from,
-                "user_to": message_action.user_to,
+                "user_from": message_action.user_from.id,
+                "user_to": message_action.user_to.id,
                 "message": message_action.message
             })
         return result
