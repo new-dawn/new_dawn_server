@@ -98,6 +98,8 @@ class UserActionResource(ModelResource):
             |
             (Q(user_to__id__exact=request.GET["user_from"]) & Q(user_from__id__exact=request.GET["user_to"]))
         ).order_by("update_time")
+        if "only_last" in request.GET and request.GET["only_last"] == "1":
+            messages = messages[len(messages)-1:]
         return self.create_response(request, ClientResponse(
             success=True,
             message="Message Get Successful",

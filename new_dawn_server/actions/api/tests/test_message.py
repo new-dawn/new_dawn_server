@@ -164,6 +164,16 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(res_data["objects"][1]["user_to"], 1)
         self.assertEqual(res_data["objects"][1]["message"], "I'm good")
 
+        # Test GET API for all messages between user 1 and user 2
+        res = self.api_client.get(
+            "/api/v1/user_action/get_messages/?user_from=1&user_to=2&only_last=1", format="json"
+        )
+        res_data = json.loads(res.content)
+        self.assertEqual(len(res_data["objects"]), 1)
+        self.assertEqual(res_data["objects"][0]["user_from"], 2)
+        self.assertEqual(res_data["objects"][0]["user_to"], 1)
+        self.assertEqual(res_data["objects"][0]["message"], "I'm good")
+
         res = self.api_client.get(
             "/api/v1/user_action/get_messages/?user_from=2&user_to=3", format="json"
         )
