@@ -12,11 +12,12 @@ from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 
+
 class MultipartResource(object):
     def deserialize(self, request, data, format=None):
         if not format:
-             format = request.META.get("CONTENT_TYPE", "application/json")
-        if format =="application/x-www-form-urlencoded":
+            format = request.META.get("CONTENT_TYPE", "application/json")
+        if format == "application/x-www-form-urlencoded":
             return request.POST
         if format.startswith("multipart"):
             # Tastypie has no good support for multipart request
@@ -31,13 +32,24 @@ class MultipartResource(object):
 class ImageResource(MultipartResource, ModelResource):
     user = fields.ForeignKey(UserResource, "user", related_name="images", full=True)
     media = fields.FileField(attribute="media")
+
     class Meta:
         always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
         allowed_methods = ["get", "post"]
         filtering = {
-        	"user": ALL_WITH_RELATIONS
+            "user": ALL_WITH_RELATIONS
         }
         queryset = Image.objects.all()
         resource_name = "image"
+
+    def obj_create(self, bundle, **kwargs):
+        user_uri = bundle.data.get("user")
+        user_id = int(user_uri.split("/")[-2])
+        user_obj = User.objects.get(id=user_id)
+        img_bundle = super(ImageResource, self).obj_create(bundle, user=user_obj, media=bundle.data["media"])
+        profile_obj = Profile.objects.get(user_id=user_id)
+        img_bundle.obj.profile = profile_obj
+        img_bundle.obj.save()
+        return bundle

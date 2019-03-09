@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models.fields.files import ImageFieldFile
 from django.test import TestCase
 from new_dawn_server.medias.models import Image
+from new_dawn_server.users.models import Profile
 from tastypie.test import ResourceTestCaseMixin
 
 
@@ -121,6 +122,10 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
         self.assertTrue(image_data["media"].startswith("/media/images/test_"))
         user_data = image_data["user"]
         self.assertEquals(user_data["username"], "test-user")
+        
+        # Test User and Profile fields exist
+        self.assertEquals(Image.objects.first().profile, Profile.objects.get(user__username="test-user"))
+        self.assertEquals(Image.objects.first().user, User.objects.get(username="test-user"))
 
         # Remove the uploaded file
         try:
