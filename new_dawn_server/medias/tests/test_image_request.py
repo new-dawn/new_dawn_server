@@ -122,6 +122,10 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
         user_data = image_data["user"]
         self.assertEquals(user_data["username"], "test-user")
 
+        # Test User and Profile fields exist
+        self.assertEquals(Image.objects.first().profile, "test_user_profile")
+        self.assertEquals(Image.objects.first().user, "test-user")
+
         # Remove the uploaded file
         try:
             os.remove(file.path)
