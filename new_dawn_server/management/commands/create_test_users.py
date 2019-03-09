@@ -124,7 +124,8 @@ class Command(BaseCommand):
             self.create_test_answer_questions(test_user, test_profile, "Where were you born?", "New York", 2))
 
     def handle(self, *args, **options):
-        print("Create Test User 1")
-        self.create_test_user_1()
+        # User 1 is super user
         print("Create Test User 2")
+        self.create_test_user_1()
+        print("Create Test User 3")
         self.create_test_user_2()
