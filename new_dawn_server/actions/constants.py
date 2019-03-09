@@ -1,5 +1,6 @@
 from enum import Enum
 
+END_USER_ID = "end_user_id"
 
 class ActionType(Enum):
     LIKE = 1
