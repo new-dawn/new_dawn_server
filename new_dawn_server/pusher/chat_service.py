@@ -22,7 +22,7 @@ class ChatService:
 	def _build_channel_id(self):
 		if self.user_me_id < self.user_you_id:
 			return TEST_CHANNEL + "_" + self.user_me_id + "_" + self.user_you_id
-		return TEST_CHANNEL + "_" + self.user_me_id + "_" + self.user_you_id
+		return TEST_CHANNEL + "_" + self.user_you_id + "_" + self.user_me_id
 
 	def send(self, message):
 		pusher_client = pusher.Pusher(

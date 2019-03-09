@@ -121,7 +121,7 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
         self.assertTrue(image_data["media"].startswith("/media/images/test_"))
         user_data = image_data["user"]
         self.assertEquals(user_data["username"], "test-user")
-
+        
         # Test User and Profile fields exist
         self.assertEquals(Image.objects.first().profile, "test_user_profile")
         self.assertEquals(Image.objects.first().user, "test-user")
