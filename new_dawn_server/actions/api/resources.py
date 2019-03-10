@@ -76,7 +76,18 @@ class UserActionResource(ModelResource):
                 ).get_response_as_dict())
 
     def message_dict_key_prefix(self, user_id):
-        return f"{END_USER_ID}_{str(user_id)}"
+        return user_id
+
+    def build_message_tuple(self, message_action):
+        return {
+            "user_from_id": message_action.user_from.id,
+            "user_from_firstname": message_action.user_from.first_name,
+            "user_from_lastname": message_action.user_from.last_name,
+            "user_to_id": message_action.user_to.id,
+            "user_to_firstname": message_action.user_to.first_name,
+            "user_to_lastname": message_action.user_to.last_name,
+            "message": message_action.message
+        }
 
     def build_message_response(self, main_actor_id, matches, messages):
         """
@@ -103,11 +114,7 @@ class UserActionResource(ModelResource):
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
-                    result[key].append({
-                        "user_from": message_action.user_from.id,
-                        "user_to": message_action.user_to.id,
-                        "message": message_action.message
-                    })
+                    result[key].append(self.build_message_tuple(message_action))
                 except KeyError:
                     print(
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_from.id} are not connected")
@@ -117,16 +124,17 @@ class UserActionResource(ModelResource):
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
-                    result[key].append({
-                        "user_from": message_action.user_from.id,
-                        "user_to": message_action.user_to.id,
-                        "message": message_action.message
-                    })
+                    result[key].append(self.build_message_tuple(message_action))
                 except KeyError:
                     print(
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_to.id} are not connected")
-
-        return result
+        return [
+            {
+                END_USER_ID: key,
+                "messages": value,
+            }
+            for key, value in result.items()
+        ]
 
 
     def get_messages(self, request, **kwargs):
@@ -154,6 +162,6 @@ class UserActionResource(ModelResource):
         return self.create_response(request, ClientResponse(
             success=True,
             message="Message Get Successful",
-            object_dict=self.build_message_response(request.GET["user_from"], matches, messages)
+            objects=self.build_message_response(request.GET["user_from"], matches, messages)
         ).get_response_as_dict())
 
