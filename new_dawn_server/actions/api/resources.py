@@ -161,10 +161,10 @@ class UserActionResource(ModelResource):
         # TODO: Authenticate the user before allowing GET to go through
         matches = UserAction.objects.filter(
             (Q(user_from__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.RELATIONSHIP.value))
+                & Q(action_type=ActionType.MATCH.value))
             |
             (Q(user_to__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.RELATIONSHIP.value))
+                & Q(action_type=ActionType.MATCH.value))
         ).order_by("update_time")
         messages = UserAction.objects.filter(
             (Q(user_from__id__exact=request.GET["user_from"]) 

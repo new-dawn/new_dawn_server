@@ -157,23 +157,23 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
 
     @patch("new_dawn_server.pusher.chat_service.ChatService.send")
     def test_message_user(self, send):
-        # Create relationship
+        # Create Match
         UserAction.objects.create(
-            action_type = ActionType.RELATIONSHIP.value,
+            action_type = ActionType.MATCH.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
             user_from = User.objects.get(id=1),
             user_to = User.objects.get(id=2)
         )
         UserAction.objects.create(
-            action_type = ActionType.RELATIONSHIP.value,
+            action_type = ActionType.MATCH.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
             user_from = User.objects.get(id=3),
             user_to = User.objects.get(id=2)
         )
         UserAction.objects.create(
-            action_type = ActionType.RELATIONSHIP.value,
+            action_type = ActionType.MATCH.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
             user_from = User.objects.get(id=2),
