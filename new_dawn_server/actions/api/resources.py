@@ -92,8 +92,9 @@ class UserActionResource(ModelResource):
         }
 
     def build_end_user_metainfo(self, user_obj):
+        img = Image.objects.filter(user__id=user_obj.id)
         return {
-            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media),
+            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media) if len(img) > 0 else "",
             END_USER_FIRSTNAME: user_obj.first_name,
             END_USER_LASTNAME: user_obj.last_name,
             END_USER_ID: user_obj.id,
