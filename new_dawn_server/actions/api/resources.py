@@ -1,11 +1,15 @@
 from django.conf.urls import url
 from django.contrib.auth.models import User
 from django.db.models import Q
-from new_dawn_server.actions.constants import ActionType, EntityType, END_USER_ID
+from new_dawn_server.actions.constants import (
+    ActionType, EntityType, END_USER_ID, END_USER_FIRSTNAME, END_USER_LASTNAME, END_USER_IMAGE_URL
+)
 from new_dawn_server.actions.models import UserAction
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.pusher.chat_service import ChatService
+from new_dawn_server.medias.models import Image
 from new_dawn_server.users.api.resources import UserResource
+from new_dawn_server.settings import MEDIA_URL
 from tastypie import fields
 from tastypie.authentication import (
     ApiKeyAuthentication,
@@ -33,6 +37,7 @@ class UserActionResource(ModelResource):
             "user_from": ALL_WITH_RELATIONS,
             "user_to": ALL_WITH_RELATIONS,
             "message": ALL_WITH_RELATIONS,
+            "action_type": ALL_WITH_RELATIONS
         }
 
     def prepend_urls(self):
@@ -75,9 +80,6 @@ class UserActionResource(ModelResource):
                     message="Message Sent",
                 ).get_response_as_dict())
 
-    def message_dict_key_prefix(self, user_id):
-        return user_id
-
     def build_message_tuple(self, message_action):
         return {
             "user_from_id": message_action.user_from.id,
@@ -89,6 +91,14 @@ class UserActionResource(ModelResource):
             "message": message_action.message
         }
 
+    def build_end_user_metainfo(self, user_obj):
+        return {
+            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media),
+            END_USER_FIRSTNAME: user_obj.first_name,
+            END_USER_LASTNAME: user_obj.last_name,
+            END_USER_ID: user_obj.id,
+        }
+
     def build_message_response(self, main_actor_id, matches, messages):
         """
         Return a message dict where the key is the end user's id,
@@ -96,21 +106,25 @@ class UserActionResource(ModelResource):
         current user and the end user
         """
         result = {}
+        # Keep track of the basic info of each end user
+        end_user_info = {}
         # Bootstrap the message list for each matched end user
         for match_action in matches:
             if str(match_action.user_from.id) != main_actor_id:
-                key = self.message_dict_key_prefix(match_action.user_from.id)
+                key = match_action.user_from.id
                 if key not in result:
                     result[key] = []
+                    end_user_info[key] = self.build_end_user_metainfo(match_action.user_from)
             if str(match_action.user_to.id) != main_actor_id:
-                key = self.message_dict_key_prefix(match_action.user_to.id)
+                key = match_action.user_to.id
                 if key not in result:
                     result[key] = []
+                    end_user_info[key] = self.build_end_user_metainfo(match_action.user_to)
 
         # Iterate through the list of messages
         for message_action in messages:
             if str(message_action.user_from.id) != main_actor_id:
-                key = self.message_dict_key_prefix(message_action.user_from.id)
+                key = message_action.user_from.id
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
@@ -120,7 +134,7 @@ class UserActionResource(ModelResource):
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_from.id} are not connected")
 
             if str(message_action.user_to.id) != main_actor_id:
-                key = self.message_dict_key_prefix(message_action.user_to.id)
+                key = message_action.user_to.id
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
@@ -130,7 +144,10 @@ class UserActionResource(ModelResource):
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_to.id} are not connected")
         return [
             {
-                END_USER_ID: key,
+                END_USER_ID: end_user_info[key][END_USER_ID],
+                END_USER_FIRSTNAME: end_user_info[key][END_USER_FIRSTNAME],
+                END_USER_LASTNAME: end_user_info[key][END_USER_LASTNAME],
+                END_USER_IMAGE_URL: end_user_info[key][END_USER_IMAGE_URL],
                 "messages": value,
             }
             for key, value in result.items()
