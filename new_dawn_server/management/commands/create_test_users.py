@@ -15,7 +15,7 @@ class Command(BaseCommand):
             media=url,
             order=order,
             profile=profile, 
-            update_time = "2018-01-01",
+            update_time="2018-01-01",
             user=user,
         )
         return img
@@ -84,8 +84,8 @@ class Command(BaseCommand):
         test_user = User.objects.create_user(
             first_name="Max",
             last_name="Zhang",
-            username="testuser2", 
-            email="test2@gmail.com", 
+            username="testuser2",
+            email="test2@gmail.com",
             password="testuser2"
         )
         test_account = Account.objects.create(
@@ -115,7 +115,7 @@ class Command(BaseCommand):
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 22", "images/testgirl7.jpg", 1))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 23", "images/testgirl8.jpg", 2))
         test_profile.image_set.add(self.create_test_image(test_user, test_profile, "Test Image 24", "images/testgirl9.jpg", 3))
-        
+
         test_profile.answerquestion_set.add(
             self.create_test_answer_questions(test_user, test_profile, "What's your 2019 resolution?", "Build a tower", 0))
         test_profile.answerquestion_set.add(
@@ -123,9 +123,61 @@ class Command(BaseCommand):
         test_profile.answerquestion_set.add(
             self.create_test_answer_questions(test_user, test_profile, "Where were you born?", "New York", 2))
 
+    def create_test_user_3(self):
+        # Always re-create the test user
+        User.objects.filter(username="testuser3").delete()
+        test_user = User.objects.create_user(
+            first_name="Thomas",
+            last_name="Chen",
+            username="testuser3",
+            email="test3@gmail.com",
+            password="testuser3"
+        )
+        test_account = Account.objects.create(
+            birthday="1991-05-11",
+            creation_date="2018-01-02",
+            gender="M",
+            name="test_user_3",
+            phone_number="1111111111",
+            user=test_user,
+        )
+        test_profile = Profile.objects.create(
+            account=test_account,
+            degree="Grad",
+            description="Great",
+            drink="A few",
+            employer="GG",
+            height=180,
+            hometown="China",
+            job_title="Reader",
+            profile_photo_url="images/testnyu.JPG",
+            school="CMU",
+            smoke="Socially",
+            update_time="2018-01-02",
+            user=test_user,
+        )
+        test_profile.image_set.add(
+            self.create_test_image(test_user, test_profile, "Test Image 21", "images/testman1.jpg", 0))
+        test_profile.image_set.add(
+            self.create_test_image(test_user, test_profile, "Test Image 22", "images/testman2.jpg", 1))
+        test_profile.image_set.add(
+            self.create_test_image(test_user, test_profile, "Test Image 23", "images/testman3.jpg", 2))
+        test_profile.image_set.add(
+            self.create_test_image(test_user, test_profile, "Test Image 24", "images/testman4.jpg", 3))
+
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "What's your 2019 resolution?", "Build a tower",
+                                              0))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "How are you?", "Good", 1))
+        test_profile.answerquestion_set.add(
+            self.create_test_answer_questions(test_user, test_profile, "Who's your favorite rapper", "Kanye", 2))
+
     def handle(self, *args, **options):
         # User 1 is super user
         print("Create Test User 2")
         self.create_test_user_1()
         print("Create Test User 3")
         self.create_test_user_2()
+        print("Create Test User 4")
+        self.create_test_user_3()

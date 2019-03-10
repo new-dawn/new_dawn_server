@@ -40,6 +40,26 @@ class UserActionResource(ModelResource):
             "action_type": ALL_WITH_RELATIONS
         }
 
+    @staticmethod
+    def create_match(user_from_id, user_to_id):
+        user_from = User.objects.get(id=user_from_id)
+        user_to = User.objects.get(id=user_to_id)
+        UserAction(
+            user_from=user_from,
+            user_to=user_to,
+            action_type=ActionType.MATCH.value,
+            entity_id=0,
+            entity_type=EntityType.NONE.value
+        ).save()
+
+    def obj_create(self, bundle, **kwargs):
+        super(UserActionResource, self).obj_create(bundle).obj.save()
+        if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
+                                     user_from_id=bundle.data.get("user_to_id"),
+                                     action_type=ActionType.LIKE.value).exists():
+            self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
+        return bundle
+
     def prepend_urls(self):
         return [
             url(r"^user_action/send_message/$", self.wrap_view("send_message"), name="api_send_message"),
@@ -47,10 +67,12 @@ class UserActionResource(ModelResource):
         ]
 
     def hydrate_user_from(self, bundle):
+        bundle.data["user_from_id"] = bundle.data["user_from"]
         bundle.data["user_from"] = "/api/v1/user/" + bundle.data["user_from"] + "/"
         return bundle
 
     def hydrate_user_to(self, bundle):
+        bundle.data["user_to_id"] = bundle.data["user_to"]
         bundle.data["user_to"] = "/api/v1/user/" + bundle.data["user_to"] + "/"
         return bundle
 
@@ -165,10 +187,10 @@ class UserActionResource(ModelResource):
         # TODO: Authenticate the user before allowing GET to go through
         matches = UserAction.objects.filter(
             (Q(user_from__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.RELATIONSHIP.value))
+                & Q(action_type=ActionType.MATCH.value))
             |
             (Q(user_to__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.RELATIONSHIP.value))
+                & Q(action_type=ActionType.MATCH.value))
         ).order_by("update_time")
         messages = UserAction.objects.filter(
             (Q(user_from__id__exact=request.GET["user_from"]) 

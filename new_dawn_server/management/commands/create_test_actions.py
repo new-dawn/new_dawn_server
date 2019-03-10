@@ -7,11 +7,11 @@ from new_dawn_server.actions.models import UserAction
 
 class Command(BaseCommand):
 
-    def create_relationship(self, a, b):
-        # Create relationship
+    def create_match(self, a, b):
+        # Create Match
         print(f"Relationship between {a} and {b}")
         UserAction.objects.create(
-            action_type = ActionType.RELATIONSHIP.value,
+            action_type = ActionType.MATCH.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
             user_from = User.objects.get(id=a),
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         )
 
     def create_message(self, a, b, message):
-        # Create relationship
+        # Create Message
         print(f"Message between {a} and {b}")
         UserAction.objects.create(
             action_type = ActionType.MESSAGE.value,
@@ -32,8 +32,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print("Create User Actions")
-        self.create_relationship(1,2)
-        self.create_relationship(1,3)
+        self.create_match(1,2)
+        self.create_match(1,3)
         self.create_message(1,2,"Hey there!")
         self.create_message(2,1,"Hey what's up.")
         self.create_message(1,3,"Hello I like you!")

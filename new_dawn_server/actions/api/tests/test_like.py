@@ -101,3 +101,28 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
         self.assertEqual(test_like_object.entity_id, 1)
         self.assertEqual(test_like_object.user_to.username, "duck2")
+
+    def test_match_user(self):
+        self.api_client.post(
+            "/api/v1/user_action/", format="json", data=self.like_argument
+        )
+        like_back_argument = {
+            "action_type": ActionType.LIKE.value,
+            "entity_id": 1,
+            "entity_type": EntityType.MAIN_IMAGE.value,
+            "user_from": "2",
+            "user_to": "1"
+        }
+        self.api_client.post(
+            "/api/v1/user_action/", format="json", data=like_back_argument
+        )
+        self.assertEqual(UserAction.objects.count(), 3)
+        self.assertEqual(UserAction.objects.filter(action_type=ActionType.MATCH.value).count(), 1)
+        match_obj = UserAction.objects.filter(action_type=ActionType.MATCH.value).first()
+        self.assertEqual(match_obj.entity_id, 0)
+        self.assertEqual(match_obj.user_to.id, 1)
+        self.assertEqual(match_obj.user_from.id, 2)
+        self.assertEqual(match_obj.entity_type, EntityType.NONE.value)
+
+
+
