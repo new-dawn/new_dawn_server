@@ -260,15 +260,18 @@ class ProfileResource(ModelResource):
         )
         if len(likes) > 0:
             like_obj = likes[len(likes)-1]
-            bundle.data["liked_entity_type"] = like_obj.entity_type
-            bundle.data["liked_message"] = like_obj.message
+            liked_dict = {
+                "liked_entity_type": like_obj.entity_type,
+                "liked_message": like_obj.message,
+            }
             if like_obj.entity_type == EntityType.MAIN_IMAGE.value:
                 image_obj = Image.objects.get(id=like_obj.entity_id)
-                bundle.data["liked_image_url"] = image_obj.media
+                liked_dict["liked_image_url"] = image_obj.media
             if like_obj.entity_type == EntityType.QUESTION_ANSWER.value:
                 answer_question_obj = AnswerQuestion.objects.get(id=like_obj.entity_id)
-                bundle.data["liked_question"] = answer_question_obj.question.question
-                bundle.data["liked_answer"] = answer_question_obj.answer
+                liked_dict["liked_question"] = answer_question_obj.question.question
+                liked_dict["liked_answer"] = answer_question_obj.answer
+            bundle.data["liked_info"] = liked_dict
             
             
 

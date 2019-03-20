@@ -131,9 +131,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/profile/", format="json", data={"viewer_id": 1}
         )
         res_data = json.loads(res.content)
-        self.assertEqual(res_data["objects"][1]["liked_question"], "how are you")
-        self.assertEqual(res_data["objects"][1]["liked_entity_type"], 3)
-        self.assertEqual(res_data["objects"][1]["liked_answer"], "good")
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
 
     def test_match_user(self):
         self.api_client.post(
