@@ -15,6 +15,7 @@ from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion, Question
+from new_dawn_server.settings import MEDIA_URL
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
@@ -258,7 +259,7 @@ class ProfileResource(ModelResource):
             & Q(user_to__id__exact=viewer_id) 
             & Q(action_type=ActionType.LIKE.value)
         )
-        if len(likes) > 0:
+        if likes.count():
             like_obj = likes[len(likes)-1]
             liked_dict = {
                 "liked_entity_type": like_obj.entity_type,
@@ -266,7 +267,7 @@ class ProfileResource(ModelResource):
             }
             if like_obj.entity_type == EntityType.MAIN_IMAGE.value:
                 image_obj = Image.objects.get(id=like_obj.entity_id)
-                liked_dict["liked_image_url"] = image_obj.media
+                liked_dict["liked_image_url"] = MEDIA_URL + str(image_obj.media)
             if like_obj.entity_type == EntityType.QUESTION_ANSWER.value:
                 answer_question_obj = AnswerQuestion.objects.get(id=like_obj.entity_id)
                 liked_dict["liked_question"] = answer_question_obj.question.question
