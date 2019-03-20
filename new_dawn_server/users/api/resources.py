@@ -6,9 +6,13 @@ from django.conf.urls import url
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
 from django.db.models import signals
+from new_dawn_server.actions.constants import ActionType, EntityType
+from new_dawn_server.actions.models import UserAction
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
+from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.users.models import Account
@@ -245,9 +249,33 @@ class ProfileResource(ModelResource):
         else:
             return None
 
+    def _get_liker_info(self, bundle):
+        # TODO: Refactor this out to become a standalone module
+        viewer_id = bundle.request.GET.get('viewer_id')
+        user_id = bundle.data["user"].data["id"]
+        likes = UserAction.objects.filter(
+            Q(user_from__id__exact=user_id) 
+            & Q(user_to__id__exact=viewer_id) 
+            & Q(action_type=ActionType.LIKE.value)
+        )
+        if len(likes) > 0:
+            like_obj = likes[len(likes)-1]
+            bundle.data["liked_entity_type"] = like_obj.entity_type
+            bundle.data["liked_message"] = like_obj.message
+            if like_obj.entity_type == EntityType.MAIN_IMAGE.value:
+                image_obj = Image.objects.get(id=like_obj.entity_id)
+                bundle.data["liked_image_url"] = image_obj.media
+            if like_obj.entity_type == EntityType.QUESTION_ANSWER.value:
+                answer_question_obj = AnswerQuestion.objects.get(id=like_obj.entity_id)
+                bundle.data["liked_question"] = answer_question_obj.question.question
+                bundle.data["liked_answer"] = answer_question_obj.answer
+            
+            
+
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
         bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
+        self._get_liker_info(bundle)
         return bundle
 
 
