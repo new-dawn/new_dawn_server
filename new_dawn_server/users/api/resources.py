@@ -260,7 +260,7 @@ class ProfileResource(ModelResource):
             & Q(action_type=ActionType.LIKE.value)
         )
         if likes.count():
-            like_obj = likes[len(likes)-1]
+            like_obj = likes[likes.count()-1]
             liked_dict = {
                 "liked_entity_type": like_obj.entity_type,
                 "liked_message": like_obj.message,
