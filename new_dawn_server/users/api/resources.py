@@ -296,7 +296,7 @@ class UserRegisterValidation(Validation):
 
 class UserRegisterResource(ModelResource):
     class Meta:
-        allowed_methods = ["post"]
+        allowed_methods = ["post", "put"]
         always_return_data = True
         authentication = Authentication()
         authorization = Authorization()
