@@ -67,6 +67,19 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                         "country": "US",
                         "state": "UT"
                     }
+                ],
+            "answer_question":
+                [
+                    {
+                        "question": "how are you",
+                        "order": 1,
+                        "answer": "good",
+                    },
+                    {
+                        "question": "How do you do",
+                        "order": 2,
+                        "answer": "do do"
+                    }
                 ]
         }
         self.api_client.post(
@@ -80,6 +93,14 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "entity_type": EntityType.MAIN_IMAGE.value,
             "user_from": "1",
             "user_to": "2"
+        }
+
+        self.like_argument_2 = {
+            "action_type": ActionType.LIKE.value,
+            "entity_id": 1,
+            "entity_type": EntityType.QUESTION_ANSWER.value,
+            "user_from": "2",
+            "user_to": "1"
         }
 
     def test_like_user(self):
@@ -101,6 +122,18 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
         self.assertEqual(test_like_object.entity_id, 1)
         self.assertEqual(test_like_object.user_to.username, "duck2")
+
+    def test_viewer_liked_info_fetched_from_profile(self):
+        res = self.api_client.post(
+            "/api/v1/user_action/", format="json", data=self.like_argument_2
+        )
+        res = self.api_client.get(
+            "/api/v1/profile/", format="json", data={"viewer_id": 1}
+        )
+        res_data = json.loads(res.content)
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
+        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
 
     def test_match_user(self):
         self.api_client.post(
