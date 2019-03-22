@@ -40,7 +40,6 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
-
         self.user2_arguments = {
             "first_name": "test2",
             "last_name": "user2",
