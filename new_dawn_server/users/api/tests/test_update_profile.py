@@ -40,20 +40,66 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             **self.account_arguments,
             **self.profile_arguments
         }
+
+        self.user2_arguments = {
+            "first_name": "test2",
+            "last_name": "user2",
+            "name": "goodgirl",
+            "username": "duck2",
+            "password": "test-pwd2",
+            "birthday": "1990-01-01",
+            "phone_number": "+12345678900",
+            "gender": "M",
+            "description": "nice",
+            "employer": "MANMAN",
+            "hometown": "NY",
+            "job_title": "CEO",
+            "profile_photo_url": "www",
+            "school": "NYU",
+            "smoke": "Socially",
+            "city_preference":
+                [
+                    {
+                        "city": "New York",
+                        "country": "US",
+                        "state": "NY"
+                    },
+                    {
+                        "city": "Salt Lake City",
+                        "country": "US",
+                        "state": "UT"
+                    }
+                ],
+            "answer_question":
+                [
+                    {
+                        "question": "how are you",
+                        "order": 1,
+                        "answer": "good",
+                    },
+                    {
+                        "question": "How do you do",
+                        "order": 2,
+                        "answer": "do do"
+                    }
+                ]
+        }
+
         self.api_client.post(
             "/api/v1/register/", format="json", data=self.all_arguments)
-        self.self_id = User.objects.first().id
+        # self.self_id = int(User.objects.first().id)
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=self.user2_arguments)
 
     def test_register_update_user(self):
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(Account.objects.count(), 1)
-        self.assertEqual(Profile.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(Account.objects.count(), 2)
+        self.assertEqual(Profile.objects.count(), 2)
         register_arguments_2 = {
-            "first_name": "test-update",
+            "first_name": "test-change",
             "username": "test-user",
             "last_name": "123",
             "password": "test-pwd",
-            "id": self.self_id,
         }
         account_arguments_2 = {
             "birthday": "1990-01-01",
@@ -75,25 +121,22 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         all_arguments_2 = {
             **register_arguments_2,
             **account_arguments_2,
-            **profile_arguments_2
-        }
-        all_arguments_2 = {
-            "objects": [all_arguments_2]
+            **profile_arguments_2,
         }
 
         self.api_client.put(
-            "/api/v1/register/", format="json", data=all_arguments_2)
+            "/api/v1/register/1/", format="json", data=all_arguments_2)
 
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(Account.objects.count(), 1)
-        self.assertEqual(Profile.objects.count(), 1)
-        self.assertEqual(User.objects.first().first_name, "test-update")
-        self.assertEqual(Account.objects.first().gender, "F")
-        self.assertEqual(Profile.objects.first().description, "nice22222")
-        self.assertEqual(Profile.objects.first().degree, "high school")
+        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(Account.objects.count(), 2)
+        self.assertEqual(Profile.objects.count(), 2)
+        self.assertEqual(User.objects.get(id=1).first_name, "test-change")
+        self.assertEqual(Account.objects.get(user_id=1).gender, "F")
+        self.assertEqual(Profile.objects.get(user_id=1).description, "nice22222")
+        self.assertEqual(Profile.objects.get(user_id=1).degree, "high school")
 
         res = self.api_client.get("/api/v1/profile/", format="json")
         res_data = json.loads(res.content)
-        user_data = res_data["objects"][0]
+        user_data = res_data["objects"][1]
         self.assertEqual(user_data["degree"], "high school")
         self.assertEqual(user_data["description"], "nice22222")

@@ -389,6 +389,29 @@ class UserRegisterResource(ModelResource):
             self.get_and_save_answer_question(bundle, user_bundle.obj, profile)
         return bundle
 
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        user_bundle = super(UserRegisterResource, self).obj_update(bundle, **kwargs)
+        Profile.objects.get(user=user_bundle.obj).delete()
+        Account.objects.get(user=user_bundle.obj).delete()
+        account = Account(
+            user=user_bundle.obj,
+            name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
+            **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
+        )
+        account.save()
+
+        city_preference_ls = self.get_and_save_city_pref(bundle)
+        account.city_preference.set(city_preference_ls)
+        profile = Profile(
+            user=user_bundle.obj,
+            account=account,
+            **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
+        )
+        profile.save()
+
+        self.get_and_save_answer_question(bundle, user_bundle.obj, profile)
+        return bundle
+
     def dehydrate(self, bundle):
         # Add extra fields to the response
         bundle.data["username"] = bundle.obj.username
