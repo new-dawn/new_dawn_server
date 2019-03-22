@@ -7,6 +7,7 @@ from new_dawn_server.actions.models import UserAction
 
 class Command(BaseCommand):
 
+
     def create_like(self, a, b):
         # Create Match
         print(f"Like from {a} to {b}")
@@ -17,7 +18,6 @@ class Command(BaseCommand):
             user_from = User.objects.get(id=a),
             user_to = User.objects.get(id=b)
         )
-
     def create_match(self, a, b):
         # Create Match
         print(f"Relationship between {a} and {b}")
