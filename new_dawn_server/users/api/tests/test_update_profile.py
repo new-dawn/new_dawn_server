@@ -140,3 +140,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         user_data = res_data["objects"][1]
         self.assertEqual(user_data["degree"], "high school")
         self.assertEqual(user_data["description"], "nice22222")
+        # Confirm other users' information not been affected
+        user_data_2 = res_data["objects"][0]
+        self.assertEqual(user_data_2["user"]["first_name"], "test2")
+        self.assertEqual(user_data_2["description"], "nice")
