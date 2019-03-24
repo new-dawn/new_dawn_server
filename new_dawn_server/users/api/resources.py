@@ -14,6 +14,7 @@ from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
+from new_dawn_server.pusher.notification_service import BeamsNotification
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.settings import MEDIA_URL
 from new_dawn_server.users.models import Account
@@ -94,6 +95,7 @@ class UserResource(ModelResource):
                 self.wrap_view("phone_verify_request"), name="api_phone_verify_request"),
             url(r"^user/phone_verify/authenticate/$",
                 self.wrap_view("phone_verify_authenticate"), name="api_phone_verify_authenticate"),
+            url(r"^user/notification/authenticate/$", self.wrap_view("notification_auth"), name="api_notification_authen")
         ]
 
     def login(self, request, **kwargs):
@@ -198,6 +200,22 @@ class UserResource(ModelResource):
                     message="Missing country code and phone number",
                 ).get_response_as_dict(), HttpNoContent)
 
+    def notification_auth(self, request, **kwargs):
+        self.method_check(request, allowed=["get"])
+        data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
+        user_id = data.get("user_id", "")
+        if User.objects.get(id=user_id).exist():
+            beams_token = BeamsNotification(user_id).auth()
+            return self.create_response(request, ClientResponse(
+                success=True,
+                message=beams_token,
+            ).get_response_as_dict())
+        else:
+            return self.create_response(
+                request, ClientResponse(
+                    success=False,
+                    message="User does not exist",
+                ).get_response_as_dict(), HttpNoContent)
 
 class AccountResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="account", full=True)
