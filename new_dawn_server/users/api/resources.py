@@ -190,6 +190,7 @@ class UserResource(ModelResource):
                     success=True,
                     message="Verification Successful",
                     exist=exist,
+                    user_id=user[0].id,
                 ).get_response_as_dict())
             else:
                 error_msg = ":".join([err for err in verification.errors().values()])
