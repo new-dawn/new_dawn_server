@@ -16,7 +16,8 @@ class Command(BaseCommand):
             entity_id = 1,
             entity_type = EntityType.MAIN_IMAGE.value,
             user_from = User.objects.get(id=a),
-            user_to = User.objects.get(id=b)
+            user_to = User.objects.get(id=b),
+            message = "This looks great!"
         )
     def create_match(self, a, b):
         # Create Match
