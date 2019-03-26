@@ -181,9 +181,15 @@ class UserResource(ModelResource):
                 verification_code=verification_code
             )
             if verification.ok():
+                exist = False
+                # Phone number by default is used as username
+                user = User.objects.filter(username=phone_number)
+                if user.count():
+                    exist = True
                 return self.create_response(request, ClientResponse(
                     success=True,
                     message="Verification Successful",
+                    exist=exist,
                 ).get_response_as_dict())
             else:
                 error_msg = ":".join([err for err in verification.errors().values()])
