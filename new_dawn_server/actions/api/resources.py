@@ -51,6 +51,13 @@ class UserActionResource(ModelResource):
             entity_id=0,
             entity_type=EntityType.NONE.value
         ).save()
+        UserAction(
+            user_from=user_to,
+            user_to=user_from,
+            action_type=ActionType.MATCH.value,
+            entity_id=0,
+            entity_type=EntityType.NONE.value
+        ).save()
 
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
