@@ -149,8 +149,8 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.api_client.post(
             "/api/v1/user_action/", format="json", data=like_back_argument
         )
-        self.assertEqual(UserAction.objects.count(), 3)
-        self.assertEqual(UserAction.objects.filter(action_type=ActionType.MATCH.value).count(), 1)
+        self.assertEqual(UserAction.objects.count(), 4)
+        self.assertEqual(UserAction.objects.filter(action_type=ActionType.MATCH.value).count(), 2)
         match_obj = UserAction.objects.filter(action_type=ActionType.MATCH.value).first()
         self.assertEqual(match_obj.entity_id, 0)
         self.assertEqual(match_obj.user_to.id, 1)
