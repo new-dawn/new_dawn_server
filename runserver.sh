@@ -20,4 +20,4 @@ python3 manage.py create_test_users
 python3 manage.py create_test_actions
 
 echo "-------- Run Server"
-python3 manage.py runserver
+python3 manage.py runserver 0.0.0.0:8000

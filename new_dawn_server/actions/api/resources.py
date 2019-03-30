@@ -7,6 +7,7 @@ from new_dawn_server.actions.constants import (
 from new_dawn_server.actions.models import UserAction
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.pusher.chat_service import ChatService
+from new_dawn_server.pusher.notification_service import NotificationService
 from new_dawn_server.medias.models import Image
 from new_dawn_server.users.api.resources import UserResource
 from new_dawn_server.settings import MEDIA_URL
@@ -58,13 +59,16 @@ class UserActionResource(ModelResource):
             entity_id=0,
             entity_type=EntityType.NONE.value
         ).save()
+        # NotificationService.send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
 
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
-        if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
-                                     user_from_id=bundle.data.get("user_to_id"),
-                                     action_type=ActionType.LIKE.value).exists():
-            self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
+        if bundle.data.get("action_type") == ActionType.LIKE.value:
+            # NotificationService.send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
+                                         user_from_id=bundle.data.get("user_to_id"),
+                                         action_type=ActionType.LIKE.value).exists():
+                self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         return bundle
 
     def prepend_urls(self):
@@ -104,10 +108,10 @@ class UserActionResource(ModelResource):
         )
         message_action.save()
         return self.create_response(
-                request, ClientResponse(
-                    success=True,
-                    message="Message Sent",
-                ).get_response_as_dict())
+            request, ClientResponse(
+                success=True,
+                message="Message Sent",
+            ).get_response_as_dict())
 
     def build_message_tuple(self, message_action):
         return {
@@ -123,7 +127,8 @@ class UserActionResource(ModelResource):
     def build_end_user_metainfo(self, user_obj):
         img = Image.objects.filter(user__id=user_obj.id)
         return {
-            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media) if len(img) > 0 else "",
+            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media) if len(
+                img) > 0 else "",
             END_USER_FIRSTNAME: user_obj.first_name,
             END_USER_LASTNAME: user_obj.last_name,
             END_USER_ID: user_obj.id,
@@ -183,7 +188,6 @@ class UserActionResource(ModelResource):
             for key, value in result.items()
         ]
 
-
     def get_messages(self, request, **kwargs):
         # Get messages action fetch all messages that
         # 1. Sent by the current user
@@ -193,22 +197,21 @@ class UserActionResource(ModelResource):
         self.method_check(request, allowed=["get"])
         # TODO: Authenticate the user before allowing GET to go through
         matches = UserAction.objects.filter(
-            (Q(user_from__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.MATCH.value))
+            (Q(user_from__id__exact=request.GET["user_from"])
+             & Q(action_type=ActionType.MATCH.value))
             |
-            (Q(user_to__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.MATCH.value))
+            (Q(user_to__id__exact=request.GET["user_from"])
+             & Q(action_type=ActionType.MATCH.value))
         ).order_by("update_time")
         messages = UserAction.objects.filter(
-            (Q(user_from__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.MESSAGE.value))
+            (Q(user_from__id__exact=request.GET["user_from"])
+             & Q(action_type=ActionType.MESSAGE.value))
             |
-            (Q(user_to__id__exact=request.GET["user_from"]) 
-                & Q(action_type=ActionType.MESSAGE.value))
+            (Q(user_to__id__exact=request.GET["user_from"])
+             & Q(action_type=ActionType.MESSAGE.value))
         ).order_by("update_time")
         return self.create_response(request, ClientResponse(
             success=True,
             message="Message Get Successful",
             objects=self.build_message_response(request.GET["user_from"], matches, messages)
         ).get_response_as_dict())
-

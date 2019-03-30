@@ -8,12 +8,14 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from django.db.models import signals
+from django.http import JsonResponse
 from new_dawn_server.actions.constants import ActionType, EntityType
 from new_dawn_server.actions.models import UserAction
 from new_dawn_server.locations.api.resources import CityResource
 from new_dawn_server.locations.models import CityPreference
 from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
+from new_dawn_server.pusher.notification_service import NotificationService
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.settings import MEDIA_URL
 from new_dawn_server.users.models import Account
@@ -95,6 +97,8 @@ class UserResource(ModelResource):
                 self.wrap_view("phone_verify_request"), name="api_phone_verify_request"),
             url(r"^user/phone_verify/authenticate/$",
                 self.wrap_view("phone_verify_authenticate"), name="api_phone_verify_authenticate"),
+            url(r"^user/notification/authenticate/$",
+                self.wrap_view("notification_authenticate"), name="api_notification_authenticate"),
         ]
 
     def login(self, request, **kwargs):
@@ -204,6 +208,20 @@ class UserResource(ModelResource):
                 request, ClientResponse(
                     success=False,
                     message="Missing country code and phone number",
+                ).get_response_as_dict(), HttpNoContent)
+
+    def notification_authenticate(self, request, **kwargs):
+        self.method_check(request, allowed=["get"])
+        query_string = request.META["QUERY_STRING"]
+        user_id = query_string.split("=")[1]
+        if User.objects.filter(id=int(user_id)):
+            beams_token = NotificationService.beams_auth(user_id)
+            return JsonResponse(beams_token)
+        else:
+            return self.create_response(
+                request, ClientResponse(
+                    success=False,
+                    message="User id is not in system",
                 ).get_response_as_dict(), HttpNoContent)
 
 
