@@ -117,7 +117,8 @@ class UserActionResource(ModelResource):
             "user_to_id": message_action.user_to.id,
             "user_to_firstname": message_action.user_to.first_name,
             "user_to_lastname": message_action.user_to.last_name,
-            "message": message_action.message
+            "message": message_action.message,
+            "message_id": message_action.id
         }
 
     def build_end_user_metainfo(self, user_obj):
