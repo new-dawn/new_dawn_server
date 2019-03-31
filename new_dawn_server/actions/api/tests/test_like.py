@@ -104,7 +104,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         }
 
     @patch("new_dawn_server.pusher.notification_service.NotificationService.send_notification")
-    def test_like_user(self, send_notification):
+    def test_like_user(self, mock_beams_client):
         res = self.api_client.post(
             "/api/v1/user_action/", format="json", data=self.like_argument
         )

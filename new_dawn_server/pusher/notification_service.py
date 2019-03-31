@@ -5,7 +5,7 @@ from new_dawn_server.settings import (
 )
 
 
-class NotificationService:
+class NotificationService():
 
     def __init__(self):
         self.beams_client = PushNotifications(instance_id=BEAMS_INSTANCE_ID, secret_key=BEAMS_SECRET_KEY)
