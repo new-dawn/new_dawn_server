@@ -18,7 +18,7 @@ class NotificationService:
         return beams_token
 
     @staticmethod
-    def send_notification(user_ids, message=None, title=None):
+    def send_notification(user_ids, message=None):
         response = beams_client.publish_to_users(
             user_ids=user_ids,
             publish_body={
