@@ -215,7 +215,7 @@ class UserResource(ModelResource):
         query_string = request.META["QUERY_STRING"]
         user_id = query_string.split("=")[1]
         if User.objects.filter(id=int(user_id)):
-            beams_token = NotificationService.beams_auth(user_id)
+            beams_token = NotificationService().beams_auth(user_id)
             return JsonResponse(beams_token)
         else:
             return self.create_response(

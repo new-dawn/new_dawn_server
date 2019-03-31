@@ -59,12 +59,12 @@ class UserActionResource(ModelResource):
             entity_id=0,
             entity_type=EntityType.NONE.value
         ).save()
-        NotificationService.send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+        NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
 
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
-            NotificationService.send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
