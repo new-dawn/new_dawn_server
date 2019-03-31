@@ -23,6 +23,7 @@ class NotificationTest(ResourceTestCaseMixin, TestCase):
 
     @patch("new_dawn_server.pusher.notification_service.NotificationService")
     def test_authenticate(self, mock_service):
+        mock_service.beams_client = MagicMock()
         mock_service.beams_client.beams_auth.return_value = {
             "token": "XXXXXXXXXXXXXX"
         }
