@@ -1,8 +1,12 @@
 from pusher_push_notifications import PushNotifications
+from new_dawn_server.settings import (
+    BEAMS_INSTANCE_ID,
+    BEAMS_SECRET_KEY
+)
 
 beams_client = PushNotifications(
-    instance_id='466cb5de-0fd2-40c7-ad45-802b6c79550e',
-    secret_key='26C789164E94F87D4125293F36DE3C988A36998FBEF78FE8BFE86B274E998BFD',
+    instance_id=BEAMS_INSTANCE_ID,
+    secret_key=BEAMS_SECRET_KEY,
 )
 
 
