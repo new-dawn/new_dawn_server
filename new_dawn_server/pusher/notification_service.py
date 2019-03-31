@@ -27,11 +27,5 @@ class NotificationService:
                         'alert': message,
                     },
                 },
-                'fcm': {
-                    'notification': {
-                        'title': 'Hello',
-                        'body': 'Hello, world!',
-                    },
-                },
             },
         )
