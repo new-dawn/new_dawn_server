@@ -103,65 +103,95 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "user_to": "1"
         }
 
-    @patch("new_dawn_server.pusher.notification_service.beams_client")
-    def test_like_user(self, mock_beams_client):
-        mock_beams_client.publish_to_users = MagicMock()
-        res = self.api_client.post(
-            "/api/v1/user_action/", format="json", data=self.like_argument
-        )
-        res_data = json.loads(res.content)
-        # Check post response
-        for k, v in self.like_argument.items():
-            if k == "user_from" or k == "user_to":
-                self.assertEqual(res_data[k]["resource_uri"], "/api/v1/user/" + self.like_argument[k] + "/")
-            else:
-                self.assertEqual(res_data[k], self.like_argument[k])
-        # Check creation of objects
-        self.assertEqual(User.objects.count(), 2)
-        self.assertEqual(UserAction.objects.count(), 1)
-        test_like_object = UserAction.objects.get(user_from__id=1)
-        self.assertEqual(test_like_object.action_type, ActionType.LIKE.value)
-        self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
-        self.assertEqual(test_like_object.entity_id, 1)
-        self.assertEqual(test_like_object.user_to.username, "duck2")
+    def test_like_user(self):
+        with patch(
+                "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+                return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            res = self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.like_argument
+            )
+            res_data = json.loads(res.content)
+            # Check post response
+            for k, v in self.like_argument.items():
+                if k == "user_from" or k == "user_to":
+                    self.assertEqual(res_data[k]["resource_uri"], "/api/v1/user/" + self.like_argument[k] + "/")
+                else:
+                    self.assertEqual(res_data[k], self.like_argument[k])
+            # Check creation of objects
+            self.assertEqual(User.objects.count(), 2)
+            self.assertEqual(UserAction.objects.count(), 1)
+            test_like_object = UserAction.objects.get(user_from__id=1)
+            self.assertEqual(test_like_object.action_type, ActionType.LIKE.value)
+            self.assertEqual(test_like_object.entity_type, EntityType.MAIN_IMAGE.value)
+            self.assertEqual(test_like_object.entity_id, 1)
+            self.assertEqual(test_like_object.user_to.username, "duck2")
 
-    @patch("new_dawn_server.pusher.notification_service.beams_client")
-    def test_viewer_liked_info_fetched_from_profile(self, mock_beams_client):
-        mock_beams_client.publish_to_users = MagicMock()
-        res = self.api_client.post(
-            "/api/v1/user_action/", format="json", data=self.like_argument_2
-        )
-        res = self.api_client.get(
-            "/api/v1/profile/", format="json", data={"viewer_id": 1}
-        )
-        res_data = json.loads(res.content)
-        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
-        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
-        self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
+    def test_viewer_liked_info_fetched_from_profile(self):
+        with patch(
+            "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+            return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.like_argument_2
+            )
+            res = self.api_client.get(
+                "/api/v1/profile/", format="json", data={"viewer_id": 1}
+            )
+            res_data = json.loads(res.content)
+            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
+            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
+            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
 
-    @patch("new_dawn_server.pusher.notification_service.beams_client")
-    def test_match_user(self, mock_beams_client):
-        mock_beams_client.publish_to_users = MagicMock()
-        self.api_client.post(
-            "/api/v1/user_action/", format="json", data=self.like_argument
-        )
-        like_back_argument = {
-            "action_type": ActionType.LIKE.value,
-            "entity_id": 1,
-            "entity_type": EntityType.MAIN_IMAGE.value,
-            "user_from": "2",
-            "user_to": "1"
-        }
-        self.api_client.post(
-            "/api/v1/user_action/", format="json", data=like_back_argument
-        )
-        self.assertEqual(UserAction.objects.count(), 4)
-        self.assertEqual(UserAction.objects.filter(action_type=ActionType.MATCH.value).count(), 2)
-        match_obj = UserAction.objects.filter(action_type=ActionType.MATCH.value).first()
-        self.assertEqual(match_obj.entity_id, 0)
-        self.assertEqual(match_obj.user_to.id, 1)
-        self.assertEqual(match_obj.user_from.id, 2)
-        self.assertEqual(match_obj.entity_type, EntityType.NONE.value)
+    def test_match_user(self):
+        with patch(
+                "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+                return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.like_argument
+            )
+            like_back_argument = {
+                "action_type": ActionType.LIKE.value,
+                "entity_id": 1,
+                "entity_type": EntityType.MAIN_IMAGE.value,
+                "user_from": "2",
+                "user_to": "1"
+            }
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=like_back_argument
+            )
+            self.assertEqual(UserAction.objects.count(), 4)
+            self.assertEqual(UserAction.objects.filter(action_type=ActionType.MATCH.value).count(), 2)
+            match_obj = UserAction.objects.filter(action_type=ActionType.MATCH.value).first()
+            self.assertEqual(match_obj.entity_id, 0)
+            self.assertEqual(match_obj.user_to.id, 1)
+            self.assertEqual(match_obj.user_from.id, 2)
+            self.assertEqual(match_obj.entity_type, EntityType.NONE.value)
 
 
 

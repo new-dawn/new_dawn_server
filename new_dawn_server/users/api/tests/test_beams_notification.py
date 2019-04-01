@@ -21,19 +21,26 @@ class NotificationTest(ResourceTestCaseMixin, TestCase):
         res_body = json.loads(res.content)
         self.user_id = res_body["id"]
 
-    @patch("new_dawn_server.pusher.notification_service.beams_client")
-    def test_authenticate(self, mock_beams_client):
-        mock_beams_client.generate_token = MagicMock()
-        mock_beams_client.generate_token.return_value = {
-            "token": "XXXXXXXXXXXXXX"
-        }
-        self.assertEqual(User.objects.count(), 1)
-        # Positive: authentication successful
-        res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=1")
-        res_body = json.loads(res.content)
-        self.assertIn("token", res_body)
-        type(mock_beams_client.generate_token).status_code = PropertyMock(return_value=204)
-        # Negative: authentication fails
-        res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=10")
-        # No content response
-        self.assertEqual(res.status_code, 204)
+    def test_authenticate(self):
+        with patch(
+            "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+            return_value=["instance", "key"]
+        ), patch(
+             "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+             "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.assertEqual(User.objects.count(), 1)
+            # Positive: authentication successful
+            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=1")
+            res_body = json.loads(res.content)
+            self.assertIn("token", res_body)
+            self.assertEqual(res_body["token"], "XXX")
+            # Negative: authentication fails
+            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=10")
+            # No content response
+            self.assertEqual(res.status_code, 204)
