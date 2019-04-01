@@ -1,13 +1,10 @@
 from pusher_push_notifications import PushNotifications
-from new_dawn_server.settings import (
-    BEAMS_INSTANCE_ID,
-    BEAMS_SECRET_KEY
-)
+from django.conf import settings
 
 
 beams_client = PushNotifications(
-            instance_id=BEAMS_INSTANCE_ID,
-            secret_key=BEAMS_SECRET_KEY,
+            instance_id=settings.BEAMS_INSTANCE_ID,
+            secret_key=settings.BEAMS_SECRET_KEY,
         )
 
 
