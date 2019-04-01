@@ -5,7 +5,7 @@ from django.test import TestCase
 from new_dawn_server.actions.constants import ActionType, EntityType
 from new_dawn_server.actions.models import UserAction
 from tastypie.test import ResourceTestCaseMixin
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 class UserActionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
@@ -103,8 +103,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "user_to": "1"
         }
 
-    @patch("new_dawn_server.pusher.notification_service.NotificationService.send_notification")
+    @patch("new_dawn_server.pusher.notification_service.beams_client")
     def test_like_user(self, mock_beams_client):
+        mock_beams_client.publish_to_users = MagicMock()
         res = self.api_client.post(
             "/api/v1/user_action/", format="json", data=self.like_argument
         )
@@ -124,8 +125,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(test_like_object.entity_id, 1)
         self.assertEqual(test_like_object.user_to.username, "duck2")
 
-    @patch("new_dawn_server.pusher.notification_service.NotificationService.send_notification")
-    def test_viewer_liked_info_fetched_from_profile(self, send_notification):
+    @patch("new_dawn_server.pusher.notification_service.beams_client")
+    def test_viewer_liked_info_fetched_from_profile(self, mock_beams_client):
+        mock_beams_client.publish_to_users = MagicMock()
         res = self.api_client.post(
             "/api/v1/user_action/", format="json", data=self.like_argument_2
         )
@@ -137,8 +139,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
         self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
 
-    @patch("new_dawn_server.pusher.notification_service.NotificationService.send_notification")
-    def test_match_user(self, send_notification):
+    @patch("new_dawn_server.pusher.notification_service.beams_client")
+    def test_match_user(self, mock_beams_client):
+        mock_beams_client.publish_to_users = MagicMock()
         self.api_client.post(
             "/api/v1/user_action/", format="json", data=self.like_argument
         )
