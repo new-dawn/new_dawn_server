@@ -33,7 +33,7 @@ SECRET_KEY = 'zm9)3y%(5o$i(heucha&q*&8!uiz17yv(w9d@q(9%)0peu5kbq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.elasticbeanstalk.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['.elasticbeanstalk.com', '127.0.0.1', 'localhost', "*"]
 
 
 # Application definition
@@ -146,3 +146,5 @@ PUSHER_APP_KEY=os.environ.get('PUSHER_APP_KEY')
 PUSHER_APP_SECRET=os.environ.get('PUSHER_APP_SECRET')
 PUSHER_APP_ID=os.environ.get('PUSHER_APP_ID')
 PUSHER_CLUSTER=os.environ.get('PUSHER_CLUSTER')
+BEAMS_INSTANCE_ID = os.environ.get("BEAMS_INSTANCE_ID")
+BEAMS_SECRET_KEY = os.environ.get("BEAMS_SECRET_KEY")
