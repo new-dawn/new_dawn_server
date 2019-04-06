@@ -292,10 +292,16 @@ class ProfileResource(ModelResource):
                 "liked_message": like_obj.message,
             }
             if like_obj.entity_type == EntityType.MAIN_IMAGE.value:
-                image_obj = Image.objects.get(id=like_obj.entity_id)
+                try:
+                    image_obj = Image.objects.get(id=like_obj.entity_id)
+                except:
+                    image_obj = Image.objects.get(id=1)
                 liked_dict["liked_image_url"] = MEDIA_URL + str(image_obj.media)
             if like_obj.entity_type == EntityType.QUESTION_ANSWER.value:
-                answer_question_obj = AnswerQuestion.objects.get(id=like_obj.entity_id)
+                try:
+                    answer_question_obj = AnswerQuestion.objects.get(id=like_obj.entity_id)
+                except:
+                    answer_question_obj = AnswerQuestion.objects.get(id=1)
                 liked_dict["liked_question"] = answer_question_obj.question.question
                 liked_dict["liked_answer"] = answer_question_obj.answer
             bundle.data["liked_info"] = liked_dict
