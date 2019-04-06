@@ -174,10 +174,10 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(User.objects.count(), 2)
         self.assertEqual(Account.objects.count(), 2)
         self.assertEqual(Profile.objects.count(), 2)
-        # Question Answers are deleted once profile is updated without them
-        self.assertEqual(AnswerQuestion.objects.count(), 2)
-        # Images are deleted once profile is updated without them
-        self.assertEqual(Image.objects.count(), 0)
+        # Question Answers are kept after update
+        self.assertEqual(AnswerQuestion.objects.count(), 4)
+        # Images are kept after update
+        self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(User.objects.get(id=1).first_name, "test-change")
         self.assertEqual(Account.objects.get(user_id=1).gender, "F")
         self.assertEqual(Profile.objects.get(user_id=1).description, "nice22222")
@@ -192,3 +192,25 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         user_data_2 = res_data["objects"][0]
         self.assertEqual(user_data_2["user"]["first_name"], "test2")
         self.assertEqual(user_data_2["description"], "nice")
+
+        # Get profile should not get images from updated profile
+        self.assertEqual(len(user_data["images"]), 0)
+        self.assertEqual(len(user_data_2["images"]), 0)
+
+        # Updated image will link to updated profiles
+        with open("media/images/test.png", "rb") as photo_file:
+            test_data_json = json.dumps(self.test_data)
+            full_data = {
+                "data": test_data_json,
+                "media": photo_file,
+            }
+            response = self.client.post(
+                '/api/v1/image/',
+                data=full_data,
+            )
+        res = self.api_client.get("/api/v1/profile/", format="json")
+        res_data = json.loads(res.content)
+        user_data = res_data["objects"][1]
+        # You can only get one image from this profile after update
+        self.assertEqual(Image.objects.count(), 2)
+        self.assertEqual(len(user_data["images"]), 1)

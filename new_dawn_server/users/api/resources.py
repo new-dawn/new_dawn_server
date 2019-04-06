@@ -419,15 +419,6 @@ class UserRegisterResource(ModelResource):
         user_bundle = super(UserRegisterResource, self).obj_update(bundle, **kwargs)
         Profile.objects.get(user=user_bundle.obj).delete()
         Account.objects.get(user=user_bundle.obj).delete()
-        existing_imgs = Image.objects.filter(user=user_bundle.obj)
-        for existing_img in existing_imgs:
-            file = existing_img.media.path
-            # Remove the uploaded file
-            try:
-                os.remove(file)
-            except OSError:
-                pass
-        Image.objects.filter(user=user_bundle.obj).delete()
         account = Account(
             user=user_bundle.obj,
             name=self._get_account_name(user_bundle.obj.first_name, user_bundle.obj.last_name),
