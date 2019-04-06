@@ -12,7 +12,7 @@ class Question(models.Model):
 class AnswerQuestion(models.Model):
     answer = models.CharField(max_length=150)
     order = models.IntegerField(blank=True, null=True)
-    profile = models.ForeignKey(Profile, blank=True, on_delete=models.SET_NULL, null=True)
+    profile = models.ForeignKey(Profile, blank=True, on_delete=models.CASCADE, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     update_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
