@@ -122,7 +122,7 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
         self.assertTrue(image_data["media"].startswith("/media/images/test_"))
         user_data = image_data["user"]
         self.assertEquals(user_data["username"], "test-user")
-        
+
         # Test User and Profile fields exist
         self.assertEquals(Image.objects.first().profile, Profile.objects.get(user__username="test-user"))
         self.assertEquals(Image.objects.first().user, User.objects.get(username="test-user"))
@@ -132,3 +132,81 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
             os.remove(file.path)
         except OSError:
             pass
+
+    def test_get_multiple_images(self):
+        register_arguments_2 = {
+            "first_name": "test2",
+            "last_name": "user2",
+            "username": "test-user2",
+            "password": "test-pwd2",
+        }
+        self.api_client.post(
+            "/api/v1/register/", format="json", data=register_arguments_2)
+        test_data_2 = {
+            "caption": "good",
+            "order": 2,
+            "user": "/api/v1/user/2/",
+        }
+        # User 2 post "order 2" image
+        with open("media/images/testman1.jpg", "rb") as photo_file:
+            test_data_json = json.dumps(test_data_2)
+            full_data = {
+                "data": test_data_json,
+                "media": photo_file,
+            }
+            response = self.client.post(
+                '/api/v1/image/',
+                data=full_data,
+            )
+        test_data_1 = {
+            "caption": "good",
+            "order": 1,
+            "user": "/api/v1/user/2/",
+        }
+        # User 2 post "order 1" image
+        with open("media/images/test.png", "rb") as photo_file:
+            test_data_json = json.dumps(test_data_1)
+            full_data = {
+                "data": test_data_json,
+                "media": photo_file,
+            }
+            response = self.client.post(
+                '/api/v1/image/',
+                data=full_data,
+            )
+        test_data_3 = {
+            "caption": "good",
+            "order": 1,
+            "user": "/api/v1/user/1/",
+        }
+        # User 1 post "order 1" image
+        with open("media/images/testman2.jpg", "rb") as photo_file:
+            test_data_json = json.dumps(test_data_3)
+            full_data = {
+                "data": test_data_json,
+                "media": photo_file,
+            }
+            response = self.client.post(
+                '/api/v1/image/',
+                data=full_data,
+            )
+
+        res = self.api_client.get("/api/v1/image/", format="json")
+        res_data = json.loads(res.content)
+        data = res_data["objects"]
+
+        # Verify the ordering of image request
+        self.assertEqual(data[0]["user"]["id"], 1)
+        self.assertEqual(data[1]["user"]["id"], 2)
+        self.assertEqual(data[2]["user"]["id"], 2)
+        self.assertEqual(data[0]["order"], 1)
+        self.assertEqual(data[1]["order"], 1)
+        self.assertEqual(data[2]["order"], 2)
+
+        images = Image.objects.all()
+        for image in images:
+            file = image.media
+            try:
+                os.remove(file.path)
+            except OSError:
+                pass
