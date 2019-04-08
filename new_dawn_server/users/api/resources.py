@@ -196,6 +196,8 @@ class UserResource(ModelResource):
                     message="Verification Successful",
                     exist=exist,
                     user_id=user[0].id if user.count() else 0,
+                    username=user[0].username if user.count() else "",
+                    token=user[0].api_key.key if user.count() else "",
                 ).get_response_as_dict())
             else:
                 error_msg = ":".join([err for err in verification.errors().values()])
