@@ -41,7 +41,7 @@ class ImageResource(MultipartResource, ModelResource):
         filtering = {
             "user": ALL_WITH_RELATIONS
         }
-        queryset = Image.objects.all()
+        queryset = Image.objects.all().order_by("user__id", "order")
         resource_name = "image"
 
     def obj_create(self, bundle, **kwargs):
