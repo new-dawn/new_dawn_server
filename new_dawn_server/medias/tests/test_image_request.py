@@ -210,3 +210,11 @@ class ImageTest(ResourceTestCaseMixin, TestCase):
                 os.remove(file.path)
             except OSError:
                 pass
+
+        res = self.api_client.get("/api/v1/profile/?user__id=2", format="json")
+        res_data = json.loads(res.content)
+        data = res_data["objects"]
+        self.assertEqual(data[0]["images"][0]["order"], 1)
+        self.assertEqual(data[0]["images"][1]["order"], 2)
+        # Verify the ordering of images in user profile
+

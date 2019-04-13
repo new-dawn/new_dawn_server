@@ -11,3 +11,6 @@ class Image(models.Model):
     profile = models.ForeignKey(Profile, blank=True, on_delete=models.SET_NULL, null=True)
     update_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+    	ordering = ['order']
