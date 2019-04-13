@@ -249,8 +249,7 @@ class ProfileResource(ModelResource):
     user = fields.ToOneField(UserResource, "user", related_name="profile", full=True)
     images = fields.ToManyField(
         "new_dawn_server.medias.api.resources.ImageResource",
-        "image_set",
-        related_name="profile", full=True, null=True,
+        "image_set", related_name="profile", full=True, null=True,
     )
     answer_questions = fields.ToManyField(
         "new_dawn_server.questions.api.resources.AnswerQuestionResource",
