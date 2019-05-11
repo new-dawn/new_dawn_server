@@ -195,7 +195,7 @@ class UserResource(ModelResource):
                     success=True,
                     message="Verification Successful",
                     exist=exist,
-                    username=user[0].username if user.count() else "",
+                    user_id=user[0].username if user.count() else "",
                     token=user[0].api_key.key if user.count() else "",
                 ).get_response_as_dict())
             else:
@@ -447,6 +447,6 @@ class UserRegisterResource(ModelResource):
 
     def dehydrate(self, bundle):
         # Add extra fields to the response
-        bundle.data["username"] = bundle.obj.username
+        bundle.data["id"] = bundle.obj.username
         bundle.data["token"] = bundle.obj.api_key.key
         return bundle
