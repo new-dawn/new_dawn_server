@@ -43,8 +43,8 @@ class UserActionResource(ModelResource):
 
     @staticmethod
     def create_match(user_from_id, user_to_id):
-        user_from = User.objects.get(id=user_from_id)
-        user_to = User.objects.get(id=user_to_id)
+        user_from = User.objects.get(username=user_from_id)
+        user_to = User.objects.get(username=user_to_id)
         UserAction(
             user_from=user_from,
             user_to=user_to,
@@ -65,8 +65,8 @@ class UserActionResource(ModelResource):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
             NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
-            if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
-                                         user_from_id=bundle.data.get("user_to_id"),
+            if UserAction.objects.filter(user_to__username=bundle.data.get("user_from_id"),
+                                         user_from__username=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
                 self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         return bundle
@@ -77,14 +77,18 @@ class UserActionResource(ModelResource):
             url(r"^user_action/get_messages/$", self.wrap_view("get_messages"), name="api_get_messages"),
         ]
 
+    def construct_resource_uri(self, username):
+        user = User.objects.get(username=username)
+        return "api/v1/user/" + str(user.id) + "/"
+
     def hydrate_user_from(self, bundle):
         bundle.data["user_from_id"] = bundle.data["user_from"]
-        bundle.data["user_from"] = "/api/v1/user/" + bundle.data["user_from"] + "/"
+        bundle.data["user_from"] = self.construct_resource_uri(bundle.data["user_from"])
         return bundle
 
     def hydrate_user_to(self, bundle):
         bundle.data["user_to_id"] = bundle.data["user_to"]
-        bundle.data["user_to"] = "/api/v1/user/" + bundle.data["user_to"] + "/"
+        bundle.data["user_to"] = self.construct_resource_uri(bundle.data["user_to"])
         return bundle
 
     def send_message(self, request, **kwargs):
@@ -102,8 +106,8 @@ class UserActionResource(ModelResource):
             action_type=ActionType.MESSAGE.value,
             entity_id=1,
             entity_type=EntityType.NONE.value,
-            user_from=User.objects.get(id=int(user_from)),
-            user_to=User.objects.get(id=int(user_to)),
+            user_from=User.objects.get(username=user_from),
+            user_to=User.objects.get(username=user_to),
             message=message
         )
         message_action.save()
@@ -115,10 +119,10 @@ class UserActionResource(ModelResource):
 
     def build_message_tuple(self, message_action):
         return {
-            "user_from_id": message_action.user_from.id,
+            "user_from_id": message_action.user_from.username,
             "user_from_firstname": message_action.user_from.first_name,
             "user_from_lastname": message_action.user_from.last_name,
-            "user_to_id": message_action.user_to.id,
+            "user_to_id": message_action.user_to.username,
             "user_to_firstname": message_action.user_to.first_name,
             "user_to_lastname": message_action.user_to.last_name,
             "message": message_action.message,
@@ -126,13 +130,13 @@ class UserActionResource(ModelResource):
         }
 
     def build_end_user_metainfo(self, user_obj):
-        img = Image.objects.filter(user__id=user_obj.id)
+        img = Image.objects.filter(user__username=user_obj.username)
         return {
-            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media) if len(
+            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__username=user_obj.username)[0].media) if len(
                 img) > 0 else "",
             END_USER_FIRSTNAME: user_obj.first_name,
             END_USER_LASTNAME: user_obj.last_name,
-            END_USER_ID: user_obj.id,
+            END_USER_ID: user_obj.username,
         }
 
     def build_message_response(self, main_actor_id, matches, messages):
@@ -146,38 +150,38 @@ class UserActionResource(ModelResource):
         end_user_info = {}
         # Bootstrap the message list for each matched end user
         for match_action in matches:
-            if str(match_action.user_from.id) != main_actor_id:
-                key = match_action.user_from.id
+            if str(match_action.user_from.username) != main_actor_id:
+                key = match_action.user_from.username
                 if key not in result:
                     result[key] = []
                     end_user_info[key] = self.build_end_user_metainfo(match_action.user_from)
-            if str(match_action.user_to.id) != main_actor_id:
-                key = match_action.user_to.id
+            if str(match_action.user_to.username) != main_actor_id:
+                key = match_action.user_to.username
                 if key not in result:
                     result[key] = []
                     end_user_info[key] = self.build_end_user_metainfo(match_action.user_to)
 
         # Iterate through the list of messages
         for message_action in messages:
-            if str(message_action.user_from.id) != main_actor_id:
-                key = message_action.user_from.id
+            if str(message_action.user_from.username) != main_actor_id:
+                key = message_action.user_from.username
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
                     result[key].append(self.build_message_tuple(message_action))
                 except KeyError:
                     print(
-                        f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_from.id} are not connected")
+                        f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_from.username} are not connected")
 
-            if str(message_action.user_to.id) != main_actor_id:
-                key = message_action.user_to.id
+            if str(message_action.user_to.username) != main_actor_id:
+                key = message_action.user_to.username
                 # The key should already in the result. Otherwise the two users are
                 # not matched with each other
                 try:
                     result[key].append(self.build_message_tuple(message_action))
                 except KeyError:
                     print(
-                        f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_to.id} are not connected")
+                        f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_to.username} are not connected")
         return [
             {
                 END_USER_ID: end_user_info[key][END_USER_ID],
@@ -193,22 +197,22 @@ class UserActionResource(ModelResource):
         # Get messages action fetch all messages that
         # 1. Sent by the current user
         # 2. Received by the user that the current user matched with
-        # 3. Keyed by received user's ID
+        # 3. Keyed by received user's Username
         # 4. Sorted by action creation time
         self.method_check(request, allowed=["get"])
         # TODO: Authenticate the user before allowing GET to go through
         matches = UserAction.objects.filter(
-            (Q(user_from__id__exact=request.GET["user_from"])
+            (Q(user_from__username__exact=request.GET["user_from"])
              & Q(action_type=ActionType.MATCH.value))
             |
-            (Q(user_to__id__exact=request.GET["user_from"])
+            (Q(user_to__username__exact=request.GET["user_from"])
              & Q(action_type=ActionType.MATCH.value))
         ).order_by("update_time")
         messages = UserAction.objects.filter(
-            (Q(user_from__id__exact=request.GET["user_from"])
+            (Q(user_from__username__exact=request.GET["user_from"])
              & Q(action_type=ActionType.MESSAGE.value))
             |
-            (Q(user_to__id__exact=request.GET["user_from"])
+            (Q(user_to__username__exact=request.GET["user_from"])
              & Q(action_type=ActionType.MESSAGE.value))
         ).order_by("update_time")
         return self.create_response(request, ClientResponse(

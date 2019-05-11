@@ -195,7 +195,6 @@ class UserResource(ModelResource):
                     success=True,
                     message="Verification Successful",
                     exist=exist,
-                    user_id=user[0].id if user.count() else 0,
                     username=user[0].username if user.count() else "",
                     token=user[0].api_key.key if user.count() else "",
                 ).get_response_as_dict())
@@ -216,7 +215,7 @@ class UserResource(ModelResource):
         self.method_check(request, allowed=["get"])
         query_string = request.META["QUERY_STRING"]
         user_id = query_string.split("=")[1]
-        if User.objects.filter(id=int(user_id)):
+        if User.objects.filter(username=user_id):
             beams_token = NotificationService().beams_auth(user_id)
             return JsonResponse(beams_token)
         else:
@@ -281,10 +280,10 @@ class ProfileResource(ModelResource):
     def _get_liker_info(self, bundle):
         # TODO: Refactor this out to become a standalone module
         viewer_id = bundle.request.GET.get('viewer_id')
-        user_id = bundle.data["user"].data["id"]
+        user_id = bundle.data["user"].data["username"]
         likes = UserAction.objects.filter(
-            Q(user_from__id__exact=user_id) 
-            & Q(user_to__id__exact=viewer_id) 
+            Q(user_from__username__exact=user_id) 
+            & Q(user_to__username__exact=viewer_id) 
             & Q(action_type=ActionType.LIKE.value)
         )
         if likes.count():
