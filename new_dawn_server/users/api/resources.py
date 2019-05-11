@@ -83,7 +83,6 @@ class UserResource(ModelResource):
         allowed_methods = ["get", "post"]
         authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
-        excludes = ["is_staff", "password"]
         filtering = {"username": "exact", "id": "exact"}
         queryset = User.objects.all()
         resource_name = "user"
@@ -447,6 +446,8 @@ class UserRegisterResource(ModelResource):
 
     def dehydrate(self, bundle):
         # Add extra fields to the response
-        bundle.data["id"] = bundle.obj.username
+        # On client side, id will be equivalent to username (phone number)
+        # We won't expose the real serial id to the client
+        bundle.data["id"] = bundle.data["username"]
         bundle.data["token"] = bundle.obj.api_key.key
         return bundle
