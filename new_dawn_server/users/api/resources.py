@@ -83,7 +83,6 @@ class UserResource(ModelResource):
         allowed_methods = ["get", "post"]
         authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
-        excludes = ["is_staff", "password"]
         filtering = {"username": "exact", "id": "exact"}
         queryset = User.objects.all()
         resource_name = "user"
@@ -195,8 +194,7 @@ class UserResource(ModelResource):
                     success=True,
                     message="Verification Successful",
                     exist=exist,
-                    user_id=user[0].id if user.count() else 0,
-                    username=user[0].username if user.count() else "",
+                    user_id=user[0].username if user.count() else "",
                     token=user[0].api_key.key if user.count() else "",
                 ).get_response_as_dict())
             else:
@@ -216,7 +214,7 @@ class UserResource(ModelResource):
         self.method_check(request, allowed=["get"])
         query_string = request.META["QUERY_STRING"]
         user_id = query_string.split("=")[1]
-        if User.objects.filter(id=int(user_id)):
+        if User.objects.filter(username=user_id):
             beams_token = NotificationService().beams_auth(user_id)
             return JsonResponse(beams_token)
         else:
@@ -281,10 +279,10 @@ class ProfileResource(ModelResource):
     def _get_liker_info(self, bundle):
         # TODO: Refactor this out to become a standalone module
         viewer_id = bundle.request.GET.get('viewer_id')
-        user_id = bundle.data["user"].data["id"]
+        user_id = bundle.data["user"].data["username"]
         likes = UserAction.objects.filter(
-            Q(user_from__id__exact=user_id) 
-            & Q(user_to__id__exact=viewer_id) 
+            Q(user_from__username__exact=user_id) 
+            & Q(user_to__username__exact=viewer_id) 
             & Q(action_type=ActionType.LIKE.value)
         )
         if likes.count():
@@ -448,6 +446,8 @@ class UserRegisterResource(ModelResource):
 
     def dehydrate(self, bundle):
         # Add extra fields to the response
-        bundle.data["username"] = bundle.obj.username
+        # On client side, id will be equivalent to username (phone number)
+        # We won't expose the real serial id to the client
+        bundle.data["id"] = bundle.data["username"]
         bundle.data["token"] = bundle.obj.api_key.key
         return bundle
