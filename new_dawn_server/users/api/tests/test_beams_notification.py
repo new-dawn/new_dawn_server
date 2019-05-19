@@ -19,7 +19,7 @@ class NotificationTest(ResourceTestCaseMixin, TestCase):
         res = self.api_client.post(
             "/api/v1/register/", format="json", data=self.register_arguments)
         res_body = json.loads(res.content)
-        self.user_id = res_body["username"]
+        self.user_id = res_body["id"]
 
     def test_authenticate(self):
         with patch(
@@ -36,11 +36,11 @@ class NotificationTest(ResourceTestCaseMixin, TestCase):
         ):
             self.assertEqual(User.objects.count(), 1)
             # Positive: authentication successful
-            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=test-user")
+            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=1")
             res_body = json.loads(res.content)
             self.assertIn("token", res_body)
             self.assertEqual(res_body["token"], "XXX")
             # Negative: authentication fails
-            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=1")
+            res = self.api_client.get("/api/v1/user/notification/authenticate/?user_id=10")
             # No content response
             self.assertEqual(res.status_code, 204)
