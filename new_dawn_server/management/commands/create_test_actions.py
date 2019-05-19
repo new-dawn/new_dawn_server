@@ -15,8 +15,8 @@ class Command(BaseCommand):
             action_type = ActionType.LIKE.value,
             entity_id = 1,
             entity_type = EntityType.MAIN_IMAGE.value,
-            user_from = User.objects.get(username=a),
-            user_to = User.objects.get(username=b),
+            user_from = User.objects.get(id=a),
+            user_to = User.objects.get(id=b),
             message = "This looks great!"
         )
 
@@ -27,8 +27,8 @@ class Command(BaseCommand):
             action_type = ActionType.LIKE.value,
             entity_id = 1,
             entity_type = EntityType.QUESTION_ANSWER.value,
-            user_from = User.objects.get(username=a),
-            user_to = User.objects.get(username=b),
+            user_from = User.objects.get(id=a),
+            user_to = User.objects.get(id=b),
             message = "Sounds legit!"
         )
 
@@ -39,8 +39,8 @@ class Command(BaseCommand):
             action_type = ActionType.MATCH.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
-            user_from = User.objects.get(username=a),
-            user_to = User.objects.get(username=b)
+            user_from = User.objects.get(id=a),
+            user_to = User.objects.get(id=b)
         )
 
     def create_message(self, a, b, message):
@@ -50,20 +50,19 @@ class Command(BaseCommand):
             action_type = ActionType.MESSAGE.value,
             entity_id = 0,
             entity_type = EntityType.NONE.value,
-            user_from = User.objects.get(username=a),
-            user_to = User.objects.get(username=b),
+            user_from = User.objects.get(id=a),
+            user_to = User.objects.get(id=b),
             message = message
         )
 
     def handle(self, *args, **options):
-        super_user = os.environ['SUPER_USER_NAME']
         print("Create User Actions")
-        self.create_like_image("testuser3",super_user)
-        self.create_like_answer("testuser2",super_user)
-        self.create_match(super_user,"testuser1")
-        self.create_match(super_user,"testuser2")
-        self.create_message(super_user,"testuser1","Hey there!")
-        self.create_message("testuser1",super_user,"Hey what's up.")
-        self.create_message(super_user,"testuser2","Hello I like you!")
-        self.create_message(super_user,"testuser2","Can you talk to me?")
-        self.create_message("testuser2",super_user,"Sure why not")
+        self.create_like_image(4,1)
+        self.create_like_answer(3,1)
+        self.create_match(1,2)
+        self.create_match(1,3)
+        self.create_message(1,2,"Hey there!")
+        self.create_message(2,1,"Hey what's up.")
+        self.create_message(1,3,"Hello I like you!")
+        self.create_message(1,3,"Can you talk to me?")
+        self.create_message(3,1,"Sure why not")
