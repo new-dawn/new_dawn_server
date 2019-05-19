@@ -89,6 +89,8 @@ WSGI_APPLICATION = 'new_dawn_server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+
+# Local DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -110,7 +112,6 @@ if 'RDS_HOSTNAME' in os.environ:
             'CHARSET': 'utf-8',
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

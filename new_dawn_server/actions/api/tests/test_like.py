@@ -91,16 +91,21 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "action_type": ActionType.LIKE.value,
             "entity_id": 1,
             "entity_type": EntityType.MAIN_IMAGE.value,
-            "user_from": "1",
-            "user_to": "2"
+            "user_from": "duck",
+            "user_to": "duck2"
         }
 
         self.like_argument_2 = {
             "action_type": ActionType.LIKE.value,
             "entity_id": 1,
             "entity_type": EntityType.QUESTION_ANSWER.value,
-            "user_from": "2",
-            "user_to": "1"
+            "user_from": "duck2",
+            "user_to": "duck"
+        }
+
+        self.username_id_map = {
+            "duck": 1,
+            "duck2": 2,
         }
 
     def test_like_user(self):
@@ -123,7 +128,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             # Check post response
             for k, v in self.like_argument.items():
                 if k == "user_from" or k == "user_to":
-                    self.assertEqual(res_data[k]["resource_uri"], "/api/v1/user/" + self.like_argument[k] + "/")
+                    self.assertEqual(
+                        res_data[k]["resource_uri"], "/api/v1/user/" 
+                        + str(self.username_id_map[self.like_argument[k]]) + "/")
                 else:
                     self.assertEqual(res_data[k], self.like_argument[k])
             # Check creation of objects
@@ -152,7 +159,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                 "/api/v1/user_action/", format="json", data=self.like_argument_2
             )
             res = self.api_client.get(
-                "/api/v1/profile/", format="json", data={"viewer_id": 1}
+                "/api/v1/profile/", format="json", data={"viewer_id": "duck"}
             )
             res_data = json.loads(res.content)
             self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
@@ -179,8 +186,8 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                 "action_type": ActionType.LIKE.value,
                 "entity_id": 1,
                 "entity_type": EntityType.MAIN_IMAGE.value,
-                "user_from": "2",
-                "user_to": "1"
+                "user_from": "duck2",
+                "user_to": "duck"
             }
             self.api_client.post(
                 "/api/v1/user_action/", format="json", data=like_back_argument

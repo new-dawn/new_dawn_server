@@ -140,18 +140,18 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/register/", format="json", data=self.user4_arguments)
 
         self.message_argument = {
-            "user_from": "1",
-            "user_to": "2",
+            "user_from": "duck",
+            "user_to": "duck2",
             "message": "How are you"
         }
         self.message_argument_2 = {
-            "user_from": "2",
-            "user_to": "1",
+            "user_from": "duck2",
+            "user_to": "duck",
             "message": "I'm good"
         }
         self.message_argument_3 = {
-            "user_from": "2",
-            "user_to": "3",
+            "user_from": "duck2",
+            "user_to": "ziyi3",
             "message": "Nice to meet you"
         }
 
@@ -210,16 +210,16 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         
         # Test GET API for all messages from user 2
         res = self.api_client.get(
-            "/api/v1/user_action/get_messages/?user_from=2", format="json"
+            "/api/v1/user_action/get_messages/?user_from=duck2", format="json"
         )
         res_data = json.loads(res.content)
         # User 2 has matched with 3 people (user 1, 3, 4)
         self.assertEqual(len(res_data["objects"]), 3)
-        self.assertEqual(res_data["objects"][0]["end_user_id"], 1)
-        self.assertEqual(res_data["objects"][1]["end_user_id"], 3)
-        self.assertEqual(res_data["objects"][2]["end_user_id"], 4)
+        self.assertEqual(res_data["objects"][0]["end_user_id"], "duck")
+        self.assertEqual(res_data["objects"][1]["end_user_id"], "ziyi3")
+        self.assertEqual(res_data["objects"][2]["end_user_id"], "ziyi4")
 
         messages = res_data["objects"][0]["messages"]
-        self.assertEqual(messages[0]["user_from_id"], 1)
-        self.assertEqual(messages[0]["user_to_id"], 2)
+        self.assertEqual(messages[0]["user_from_id"], "duck")
+        self.assertEqual(messages[0]["user_to_id"], "duck2")
         self.assertEqual(messages[0]["message"], "How are you")
