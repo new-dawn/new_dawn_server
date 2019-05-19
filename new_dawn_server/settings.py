@@ -96,6 +96,20 @@ DATABASES = {
     }
 }
 
+if 'RDS_HOSTNAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+            'OPTIONS': {'init_command': 'SET storage_engine=INNODB'},
+            'COLLATION': 'utf8-general_ci',
+            'CHARSET': 'utf-8',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
