@@ -13,7 +13,7 @@ class NotificationService:
 
     @staticmethod
     def _get_instance_id_and_secret_key():
-        return [settings.BEAMS_INSTANCE_ID, settings.BEAMS_SECRET_KEY]
+        return [str(settings.BEAMS_INSTANCE_ID), str(settings.BEAMS_SECRET_KEY)]
 
     def beams_auth(self, user_id):
         beams_token = self.beams_client.generate_token(str(user_id))

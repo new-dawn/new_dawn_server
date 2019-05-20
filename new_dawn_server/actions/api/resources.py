@@ -20,6 +20,7 @@ from tastypie.authentication import (
 )
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
+import traceback
 
 
 class UserActionResource(ModelResource):
@@ -62,9 +63,15 @@ class UserActionResource(ModelResource):
         NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
 
     def obj_create(self, bundle, **kwargs):
+        print(bundle.data)
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
-            NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            try:
+                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            except:
+                print("Notification failed for like action")
+                traceback.print_exc()
+
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
@@ -80,6 +87,7 @@ class UserActionResource(ModelResource):
     def hydrate_user_from(self, bundle):
         bundle.data["user_from_id"] = bundle.data["user_from"]
         bundle.data["user_from"] = "/api/v1/user/" + bundle.data["user_from"] + "/"
+        print(bundle.data)
         return bundle
 
     def hydrate_user_to(self, bundle):
