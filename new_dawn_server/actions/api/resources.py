@@ -60,10 +60,13 @@ class UserActionResource(ModelResource):
             entity_id=0,
             entity_type=EntityType.NONE.value
         ).save()
-        NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+        try:
+            NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+        except:
+            print("Notification failed for match action")
+            traceback.print_exc()
 
     def obj_create(self, bundle, **kwargs):
-        print(bundle.data)
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
             try:
@@ -71,7 +74,6 @@ class UserActionResource(ModelResource):
             except:
                 print("Notification failed for like action")
                 traceback.print_exc()
-
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
@@ -87,7 +89,6 @@ class UserActionResource(ModelResource):
     def hydrate_user_from(self, bundle):
         bundle.data["user_from_id"] = bundle.data["user_from"]
         bundle.data["user_from"] = "/api/v1/user/" + bundle.data["user_from"] + "/"
-        print(bundle.data)
         return bundle
 
     def hydrate_user_to(self, bundle):
