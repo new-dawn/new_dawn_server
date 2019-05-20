@@ -20,6 +20,7 @@ from tastypie.authentication import (
 )
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
+import traceback
 
 
 class UserActionResource(ModelResource):
@@ -59,12 +60,20 @@ class UserActionResource(ModelResource):
             entity_id=0,
             entity_type=EntityType.NONE.value
         ).save()
-        NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+        try:
+            NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+        except:
+            print("Notification failed for match action")
+            traceback.print_exc()
 
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
-            NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            try:
+                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
+            except:
+                print("Notification failed for like action")
+                traceback.print_exc()
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
