@@ -278,15 +278,7 @@ class ProfileResource(ModelResource):
         else:
             return None
 
-    def _get_liker_info(self, bundle):
-        # TODO: Refactor this out to become a standalone module
-        viewer_id = bundle.request.GET.get('viewer_id')
-        user_id = bundle.data["user"].data["id"]
-        likes = UserAction.objects.filter(
-            Q(user_from__id__exact=user_id) 
-            & Q(user_to__id__exact=viewer_id) 
-            & Q(action_type=ActionType.LIKE.value)
-        )
+    def _build_liker_dict(self, likes):
         if likes.count():
             like_obj = likes[likes.count()-1]
             liked_dict = {
@@ -306,7 +298,27 @@ class ProfileResource(ModelResource):
                     answer_question_obj = AnswerQuestion.objects.get(id=1)
                 liked_dict["liked_question"] = answer_question_obj.question.question
                 liked_dict["liked_answer"] = answer_question_obj.answer
-            bundle.data["liked_info"] = liked_dict
+            return liked_dict
+
+
+    def _get_liker_info(self, bundle):
+        # TODO: Refactor this out to become a standalone module
+        viewer_id = bundle.request.GET.get('viewer_id')
+        user_id = bundle.data["user"].data["id"]
+        your_likes = UserAction.objects.filter(
+            Q(user_from__id__exact=user_id) 
+            & Q(user_to__id__exact=viewer_id) 
+            & Q(action_type=ActionType.LIKE.value)
+        )
+        my_likes = UserAction.objects.filter(
+            Q(user_from__id__exact=viewer_id) 
+            & Q(user_to__id__exact=user_id) 
+            & Q(action_type=ActionType.LIKE.value)
+        )
+        if your_likes.count():
+            bundle.data["liked_info_from_you"] = self._build_liker_dict(your_likes)
+        if my_likes.count():
+            bundle.data["liked_into_from_me"] = self._build_liker_dict(my_likes)
             
             
 
