@@ -317,6 +317,9 @@ class ProfileResource(ModelResource):
         )
         if your_likes.count():
             bundle.data["liked_info_from_you"] = self._build_liker_dict(your_likes)
+            # PENDING DEPRECATION: client should always read liked_info_from_you instead of liked_info
+            bundle.data["liked_info"] = self._build_liker_dict(your_likes)
+            
         if my_likes.count():
             bundle.data["liked_into_from_me"] = self._build_liker_dict(my_likes)
             
