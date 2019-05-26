@@ -103,6 +103,14 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "user_to": "1"
         }
 
+        self.like_argument_3 = {
+            "action_type": ActionType.LIKE.value,
+            "entity_id": 1,
+            "entity_type": EntityType.QUESTION_ANSWER.value,
+            "user_from": "1",
+            "user_to": "2"
+        }
+
     def test_like_user(self):
         with patch(
                 "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
@@ -151,13 +159,19 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.api_client.post(
                 "/api/v1/user_action/", format="json", data=self.like_argument_2
             )
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.like_argument_3
+            )
             res = self.api_client.get(
                 "/api/v1/profile/", format="json", data={"viewer_id": 1}
             )
             res_data = json.loads(res.content)
-            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_question"], "how are you")
-            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_entity_type"], 3)
-            self.assertEqual(res_data["objects"][1]["liked_info"]["liked_answer"], "good")
+            self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_question"], "how are you")
+            self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_entity_type"], 3)
+            self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_answer"], "good")
+            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_question"], "how are you")
+            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_entity_type"], 3)
+            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_answer"], "good")
 
     def test_match_user(self):
         with patch(
