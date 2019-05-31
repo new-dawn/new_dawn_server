@@ -107,8 +107,8 @@ if 'RDS_HOSTNAME' in os.environ:
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
             'OPTIONS': {'init_command': 'SET storage_engine=INNODB'},
-            'COLLATION': 'utf8-general_ci',
-            'CHARSET': 'utf-8',
+            'COLLATION': 'utf8mb4_unicode_ci',
+            'CHARSET': 'utf8mb4',
         }
     }
 
