@@ -21,6 +21,7 @@ class Account(models.Model):
 # An account's profile information
 class Profile(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    age = models.IntegerField(blank=True, null=True)
     # city and hometown can later be changed to location library
     degree = models.CharField(blank=True, max_length=50, null=True)
     description = models.CharField(blank=True, max_length=200, null=True)
