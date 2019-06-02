@@ -169,9 +169,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_question"], "how are you")
             self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_entity_type"], 3)
             self.assertEqual(res_data["objects"][1]["liked_info_from_you"]["liked_answer"], "good")
-            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_question"], "how are you")
-            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_entity_type"], 3)
-            self.assertEqual(res_data["objects"][1]["liked_into_from_me"]["liked_answer"], "good")
+            self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_question"], "how are you")
+            self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_entity_type"], 3)
+            self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_answer"], "good")
 
     def test_match_user(self):
         with patch(

@@ -321,7 +321,7 @@ class ProfileResource(ModelResource):
             bundle.data["liked_info"] = self._build_liker_dict(your_likes)
             
         if my_likes.count():
-            bundle.data["liked_into_from_me"] = self._build_liker_dict(my_likes)
+            bundle.data["liked_info_from_me"] = self._build_liker_dict(my_likes)
             
             
 
