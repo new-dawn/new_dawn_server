@@ -1,5 +1,6 @@
 from authy.api import AuthyApiClient
 from datetime import date
+import datetime
 from django import forms
 from django.conf import settings
 from django.conf.urls import url
@@ -270,13 +271,6 @@ class ProfileResource(ModelResource):
         queryset = Profile.objects.all()
         resource_name = "profile"
 
-    @staticmethod
-    def _get_age(birthday):
-        if birthday:
-            today = date.today()
-            return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
-        else:
-            return None
 
     def _build_liker_dict(self, likes):
         if likes.count():
@@ -327,7 +321,6 @@ class ProfileResource(ModelResource):
 
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
-        bundle.data['age'] = self._get_age(bundle.data['account'].data['birthday'])
         self._get_liker_info(bundle)
         return bundle
 
@@ -409,6 +402,15 @@ class UserRegisterResource(ModelResource):
                 )
                 answer_question.save()
 
+    @staticmethod
+    def _get_age(birthday):
+        if birthday:
+            today = date.today()
+            birthday = datetime.datetime.strptime(birthday, "%Y-%m-%d")
+            return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+        else:
+            return None
+
     def obj_create(self, bundle, **kwargs):
         """
         Override obj_create method to create related models
@@ -425,12 +427,12 @@ class UserRegisterResource(ModelResource):
                 **self._get_model_fields_dict(bundle, ACCOUNT_FIELDS)
             )
             account.save()
-
             city_preference_ls = self.get_and_save_city_pref(bundle)
             account.city_preference.set(city_preference_ls)
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
+                age=self._get_age(account.birthday),
                 **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
             )
             profile.save()

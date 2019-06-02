@@ -123,7 +123,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
-        # Extra fields
+        # Extra fields 
         self.assertEqual(res_data['objects'][0]['age'], 29)
 
     def test_user_profile_get_with_filtering(self):
