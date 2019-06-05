@@ -12,6 +12,7 @@ class ActionType(Enum):
     RELATIONSHIP = 4
     MESSAGE = 5
     REQUEST_TAKEN = 6
+    UNMATCH = 7
 
 class EntityType(Enum):
     NONE = 0
