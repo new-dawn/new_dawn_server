@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Q
 from new_dawn_server.actions.constants import (
     ActionType, EntityType, END_USER_ID, END_USER_FIRSTNAME, END_USER_LASTNAME, END_USER_IMAGE_URL
@@ -46,25 +47,48 @@ class UserActionResource(ModelResource):
     def create_match(user_from_id, user_to_id):
         user_from = User.objects.get(id=user_from_id)
         user_to = User.objects.get(id=user_to_id)
-        UserAction(
-            user_from=user_from,
-            user_to=user_to,
-            action_type=ActionType.MATCH.value,
-            entity_id=0,
-            entity_type=EntityType.NONE.value
-        ).save()
-        UserAction(
-            user_from=user_to,
-            user_to=user_from,
-            action_type=ActionType.MATCH.value,
-            entity_id=0,
-            entity_type=EntityType.NONE.value
-        ).save()
-        try:
-            NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
-        except:
-            print("Notification failed for match action")
-            traceback.print_exc()
+        with transaction.atomic():
+            UserAction(
+                user_from=user_from,
+                user_to=user_to,
+                action_type=ActionType.MATCH.value,
+                entity_id=0,
+                entity_type=EntityType.NONE.value
+            ).save()
+            UserAction(
+                user_from=user_to,
+                user_to=user_from,
+                action_type=ActionType.MATCH.value,
+                entity_id=0,
+                entity_type=EntityType.NONE.value
+            ).save()
+            try:
+                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+            except:
+                print("Notification failed for match action")
+                traceback.print_exc()
+
+    @staticmethod
+    def delete_match(user_from_id, user_to_id):
+        with transaction.atomic():
+            UserAction.objects.filter(
+                user_to__id__exact=user_from_id,
+                user_from__id__exact=user_to_id,
+                action_type__in=(
+                    ActionType.LIKE.value,
+                    ActionType.MATCH.value,
+                    ActionType.RELATIONSHIP.value,
+                    ActionType.MESSAGE.value
+                )).delete()
+            UserAction.objects.filter(
+                user_from__id__exact=user_from_id,
+                user_to__id__exact=user_to_id,
+                action_type__in=(
+                    ActionType.LIKE.value,
+                    ActionType.MATCH.value,
+                    ActionType.RELATIONSHIP.value,
+                    ActionType.MESSAGE.value
+                )).delete()
 
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
@@ -78,12 +102,15 @@ class UserActionResource(ModelResource):
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
                 self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
+        if bundle.data.get("action_type") == ActionType.UNMATCH.value:
+            self.delete_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         return bundle
 
     def prepend_urls(self):
         return [
             url(r"^user_action/send_message/$", self.wrap_view("send_message"), name="api_send_message"),
             url(r"^user_action/get_messages/$", self.wrap_view("get_messages"), name="api_get_messages"),
+            url(r"^user_action/unmatch/$", self.wrap_view("unmatch"), name="api_unmatch"),
         ]
 
     def hydrate_user_from(self, bundle):

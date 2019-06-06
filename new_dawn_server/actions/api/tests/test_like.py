@@ -207,5 +207,17 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(match_obj.user_from.id, 2)
             self.assertEqual(match_obj.entity_type, EntityType.NONE.value)
 
+            # Unmatch
+            unmatch_argument = {
+                "action_type": ActionType.UNMATCH.value,
+                "user_from": "1",
+                "user_to": "2"
+            }
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=unmatch_argument
+            )
+            self.assertEqual(UserAction.objects.count(), 1)
+            self.assertEqual(UserAction.objects.filter(action_type=ActionType.UNMATCH.value).count(), 1)
+
 
 
