@@ -60,3 +60,8 @@ Running migrations:
 (new_dawn) TZY-Mac:new_dawn_server Tang$ 
 ```
 * You should be able to see migration files generated in `migrations/`. Commit all generated changes and push to your branch
+
+
+## Tests
+1. Unit Test: Run `python3 manage.py test`.
+2. Integration Test: `./runserver` locally. Go to browser to query the endpoint you touched. See if correct data is returned.
