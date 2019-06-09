@@ -202,7 +202,6 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             res_data = json.loads(res.contant)
             self.assertEqual(res_data["objects"][1]["taken_requested"])
 
-
     def test_match_user(self):
         with patch(
                 "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",

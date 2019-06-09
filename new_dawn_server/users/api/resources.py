@@ -332,10 +332,14 @@ class ProfileResource(ModelResource):
             & Q(action_type=ActionType.REQUEST_TAKEN.value)
         )
         if your_taken.count():
-            bundle.data["taken_requested"] = True
+            bundle.data["taken_requested_from_you"] = True
+        else:
+            bundle.data["taken_requested_from_you"] = False
 
         if my_taken.count():
-            bundle.data["taken_requested"] = False
+            bundle.data["taken_requested_from_me"] = True
+        else:
+            bundle.data["taken_requested_from_me"] = False
 
 
     # Add Answer question fields in Profile Resource
