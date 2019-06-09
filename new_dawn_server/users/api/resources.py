@@ -316,12 +316,32 @@ class ProfileResource(ModelResource):
             
         if my_likes.count():
             bundle.data["liked_info_from_me"] = self._build_liker_dict(my_likes)
-            
-            
+
+
+    def _get_taken_info(self, bundle):
+        viewer_id = bundle.request.GET.get('viewer_id')
+        user_id = bundle.data["user"].data["id"]
+        your_taken = UserAction.objects.filter(
+            Q(user_from__id__exact=user_id)
+            & Q(user_to__id__exact=viewer_id)
+            & Q(action_type=ActionType.REQUEST_TAKEN.value)
+        )
+        my_taken = UserAction.objects.filter(
+            Q(user_from__id__exact=viewer_id)
+            & Q(user_to__id__exact=user_id)
+            & Q(action_type=ActionType.REQUEST_TAKEN.value)
+        )
+        if your_taken.count():
+            bundle.data["taken_requested"] = True
+
+        if my_taken.count():
+            bundle.data["taken_requested"] = False
+
 
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
         self._get_liker_info(bundle)
+        self._get_taken_info(bundle)
         return bundle
 
 
