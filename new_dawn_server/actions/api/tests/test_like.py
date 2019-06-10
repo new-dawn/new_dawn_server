@@ -111,6 +111,13 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "user_to": "2"
         }
 
+        self.taken_argument = {
+            "action_type": ActionType.REQUEST_TAKEN.value,
+            "entity_id": 0,
+            "user_from": "1",
+            "user_to": "2"
+        }
+
     def test_like_user(self):
         with patch(
                 "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
@@ -172,6 +179,29 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_question"], "how are you")
             self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_entity_type"], 3)
             self.assertEqual(res_data["objects"][1]["liked_info_from_me"]["liked_answer"], "good")
+
+    def test_viewer_taken_info_fetched_from_profile(self):
+        with patch(
+            "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+            return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.taken_argument
+            )
+            res = self.api_client.get(
+                "/api/v1/profile/", format='json', data={"viewer_id": 1}
+            )
+            res_data = json.loads(res.content)
+            self.assertEqual(res_data["objects"][1]["taken_requested_from_you"], False)
+            self.assertEqual(res_data["objects"][1]["taken_requested_from_me"], True)
 
     def test_match_user(self):
         with patch(
