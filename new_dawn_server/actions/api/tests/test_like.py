@@ -199,8 +199,9 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             res = self.api_client.get(
                 "/api/v1/profile/", format='json', data={"viewer_id": 1}
             )
-            res_data = json.loads(res.contant)
-            self.assertEqual(res_data["objects"][1]["taken_requested"])
+            res_data = json.loads(res.content)
+            self.assertEqual(res_data["objects"][1]["taken_requested_from_you"])
+            self.assertEqual(res_data["objects"][1]["taken_requested_from_me"])
 
     def test_match_user(self):
         with patch(
