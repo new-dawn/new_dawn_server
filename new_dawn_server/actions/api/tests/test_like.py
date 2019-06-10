@@ -200,7 +200,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                 "/api/v1/profile/", format='json', data={"viewer_id": 1}
             )
             res_data = json.loads(res.content)
-            self.assertEqual(res_data["objects"][1]["taken_requested_from_you"], True)
+            self.assertEqual(res_data["objects"][1]["taken_requested_from_you"], False)
             self.assertEqual(res_data["objects"][1]["taken_requested_from_me"], True)
 
     def test_match_user(self):
