@@ -33,6 +33,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "profile_photo_url": "www",
             "school": "NYU",
             "smoke": "Socially",
+            "height": 180,
         }
 
     def test_register_success(self):
@@ -143,6 +144,21 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
+    def test_user_profile_get_with_preference(self):
+        all_arguments = {
+            **self.register_arguments,
+            **self.account_arguments,
+            **self.profile_arguments
+        }
+        res = self.api_client.post("/api/v1/register/", format="json", data=all_arguments)
+        res_data = json.loads(res.content)
+        api_credential = self.create_apikey(username=res_data["username"], api_key=res_data["token"])
+
+        res = self.api_client.get("/api/v1/profile/?height__range=175,185&age__range=25,30", format="json",
+                                  authentication=api_credential)
+        res_data = json.loads(res.content)
+        for k, v in self.profile_arguments.items():
+            self.assertEqual(res_data['objects'][0][k], v)
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
