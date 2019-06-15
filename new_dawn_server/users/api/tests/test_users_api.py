@@ -33,6 +33,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "profile_photo_url": "www",
             "school": "NYU",
             "smoke": "Socially",
+            "height": 180,
         }
 
     def test_register_success(self):
@@ -143,6 +144,99 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in self.profile_arguments.items():
             self.assertEqual(res_data['objects'][0][k], v)
 
+    def test_user_profile_get_with_height_preference(self):
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user1",
+                                       "username": "test-user-1",
+                                       "password": "test-pwd",
+                                       "birthday": "1990-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 173,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user2",
+                                       "username": "test-user-2",
+                                       "password": "test-pwd",
+                                       "birthday": "1995-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 178,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user3",
+                                       "username": "test-user-3",
+                                       "password": "test-pwd",
+                                       "birthday": "1999-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 182,
+                                   })
+
+        res = self.api_client.get("/api/v1/profile/?height__range=175,180", format="json")
+        res_data = json.loads(res.content)
+        res_data_account_arguments={
+            "birthday": "1995-01-01",
+            "phone_number": "+12345678900",
+            "gender": "M",
+            "name": "test_user2"
+        }
+        for k, v in res_data_account_arguments.items():
+            self.assertEqual(res_data['objects'][0]['account'][k], v)
+        self.assertEqual(res_data['objects'][0]['height'], 178)
+
+    def test_user_profile_get_with_age_preference(self):
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user1",
+                                       "username": "test-user-1",
+                                       "password": "test-pwd",
+                                       "birthday": "1990-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 173,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user2",
+                                       "username": "test-user-2",
+                                       "password": "test-pwd",
+                                       "birthday": "1995-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 178,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user3",
+                                       "username": "test-user-3",
+                                       "password": "test-pwd",
+                                       "birthday": "1999-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 182,
+                                   })
+
+        res = self.api_client.get("/api/v1/profile/?age__range=22,26", format="json")
+        res_data = json.loads(res.content)
+        res_data_account_arguments = {
+            "birthday": "1995-01-01",
+            "phone_number": "+12345678900",
+            "gender": "M",
+            "name": "test_user2"
+        }
+        for k, v in res_data_account_arguments.items():
+            self.assertEqual(res_data['objects'][0]['account'][k], v)
+        self.assertEqual(res_data['objects'][0]['age'], 24)
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):

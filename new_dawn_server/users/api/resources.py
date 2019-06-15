@@ -266,7 +266,9 @@ class ProfileResource(ModelResource):
         authentication = MultiAuthentication(Authentication(), BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
         filtering = {
-            'user': ALL_WITH_RELATIONS
+            'user': ALL_WITH_RELATIONS,
+            'height': ALL_WITH_RELATIONS,
+            'age': ALL_WITH_RELATIONS
         }
         queryset = Profile.objects.all()
         resource_name = "profile"
