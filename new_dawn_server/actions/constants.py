@@ -13,6 +13,7 @@ class ActionType(Enum):
     MESSAGE = 5
     REQUEST_TAKEN = 6
     UNMATCH = 7
+    ACCEPT_TAKEN = 8
 
 class EntityType(Enum):
     NONE = 0
