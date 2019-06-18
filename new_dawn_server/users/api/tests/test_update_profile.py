@@ -139,6 +139,12 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(Account.objects.count(), 2)
         self.assertEqual(Profile.objects.count(), 2)
         self.assertEqual(AnswerQuestion.objects.count(), 4)
+
+        # Test if the review_status can be carried over to the new profile
+        p = Profile.objects.get(user__id=1)
+        p.review_status = 4
+        p.save()
+
         register_arguments_2 = {
             "first_name": "test-change",
             "username": "test-user",
@@ -188,6 +194,8 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         user_data = res_data["objects"][1]
         self.assertEqual(user_data["degree"], "high school")
         self.assertEqual(user_data["description"], "nice22222")
+        # Review status shouldn't change
+        self.assertEqual(res_data["objects"][1]["review_status"], 4)
         # Confirm other users' information not been affected
         user_data_2 = res_data["objects"][0]
         self.assertEqual(user_data_2["user"]["first_name"], "test2")
