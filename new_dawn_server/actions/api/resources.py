@@ -127,7 +127,7 @@ class UserActionResource(ModelResource):
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
                 self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
-        if bundle.data.get("action_type") == ActionType.REQUEST_TAKEN.value:
+        if bundle.data.get("action_type") == ActionType.ACCEPT_TAKEN.value:
             try:
                 NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are requested taken")
             except:
@@ -135,7 +135,7 @@ class UserActionResource(ModelResource):
                 traceback.print_exc()
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
-                                         action_type=ActionType.ACCEPT_TAKEN.value).exists():
+                                         action_type=ActionType.REQUEST_TAKEN.value).exists():
                 self.create_taken(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         if bundle.data.get("action_type") == ActionType.UNMATCH.value:
             self.delete_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))

@@ -347,21 +347,12 @@ class ProfileResource(ModelResource):
     def _get_taken_by_info(self, bundle):
         viewer_id = bundle.request.GET.get('viewer_id')
         user_id = bundle.data["user"].data["id"]
-        your_taken_by = UserAction.objects.filter(
+        taken_by = UserAction.objects.filter(
             Q(user_from__id__exact=user_id)
-            & Q(user_to__id__exact=viewer_id)
             & Q(action_type=ActionType.ALREADY_TAKEN.value)
         )
-        my_taken_by = UserAction.objects.filter(
-            Q(user_from__id__exact=viewer_id)
-            & Q(user_to__id__exact=user_id)
-            & Q(action_type=ActionType.ALREADY_TAKEN.value)
-        )
-        if your_taken_by.count():
-            bundle.data["taken_by_you"] = viewer_id
-
-        if my_taken_by.count():
-            bundle.data["taken_by_me"] = user_id
+        if taken_by.count():
+            bundle.data["taken_by"] = user_id
 
 
     # Add Answer question fields in Profile Resource
