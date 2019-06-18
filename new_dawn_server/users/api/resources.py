@@ -19,6 +19,7 @@ from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.pusher.notification_service import NotificationService
 from new_dawn_server.questions.models import AnswerQuestion, Question
 from new_dawn_server.settings import MEDIA_URL
+from new_dawn_server.users.constants import UserReviewStatus
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
 from tastypie import fields
@@ -268,7 +269,8 @@ class ProfileResource(ModelResource):
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'height': ALL_WITH_RELATIONS,
-            'age': ALL_WITH_RELATIONS
+            'age': ALL_WITH_RELATIONS,
+            'review_status': ALL_WITH_RELATIONS,
         }
         queryset = Profile.objects.all()
         resource_name = "profile"
@@ -459,6 +461,7 @@ class UserRegisterResource(ModelResource):
                 user=user_bundle.obj,
                 account=account,
                 age=self._get_age(account.birthday),
+                review_status=UserReviewStatus.PENDING.value,
                 **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
             )
             profile.save()
@@ -472,6 +475,7 @@ class UserRegisterResource(ModelResource):
         """
         with transaction.atomic():
             user_bundle = super(UserRegisterResource, self).obj_update(bundle, **kwargs)
+            review_status=Profile.objects.get(user=user_bundle.obj).review_status
             Profile.objects.get(user=user_bundle.obj).delete()
             Account.objects.get(user=user_bundle.obj).delete()
             account = Account(
@@ -486,6 +490,7 @@ class UserRegisterResource(ModelResource):
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
+                review_status=review_status,
                 **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
             )
             profile.save()
