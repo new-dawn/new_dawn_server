@@ -90,6 +90,31 @@ class UserActionResource(ModelResource):
                     ActionType.MESSAGE.value
                 )).delete()
 
+    @staticmethod
+    def create_taken(user_from_id, user_to_id):
+        user_from = User.objects.get(id=user_from_id)
+        user_to = User.objects.get(id=user_to_id)
+        with transaction.atomic():
+            UserAction(
+                user_from=user_from,
+                user_to=user_to,
+                action_type=ActionType.ALREADY_TAKEN.value,
+                entity_id=0,
+                entity_type=EntityType.NONE.value
+            ).save()
+            UserAction(
+                user_from=user_to,
+                user_to=user_from,
+                action_type=ActionType.ALREADY_TAKEN.value,
+                entity_id=0,
+                entity_type=EntityType.NONE.value
+            ).save()
+            try:
+                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are taken")
+            except:
+                print("Notification failed for already taken action")
+                traceback.print_exc()
+
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
@@ -102,6 +127,16 @@ class UserActionResource(ModelResource):
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
                 self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
+        if bundle.data.get("action_type") == ActionType.ACCEPT_TAKEN.value:
+            try:
+                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are requested taken")
+            except:
+                print("Notification failed for request taken action")
+                traceback.print_exc()
+            if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
+                                         user_from_id=bundle.data.get("user_to_id"),
+                                         action_type=ActionType.REQUEST_TAKEN.value).exists():
+                self.create_taken(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         if bundle.data.get("action_type") == ActionType.UNMATCH.value:
             self.delete_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         return bundle

@@ -346,10 +346,21 @@ class ProfileResource(ModelResource):
             bundle.data["taken_requested_from_me"] = False
 
 
+    def _get_taken_by_info(self, bundle):
+        user_id = bundle.data["user"].data["id"]
+        taken_by = UserAction.objects.filter(
+            Q(user_from__id__exact=user_id)
+            & Q(action_type=ActionType.ALREADY_TAKEN.value)
+        )
+        if taken_by.count():
+            bundle.data["taken_by"] = taken_by.first().user_to.id
+
+
     # Add Answer question fields in Profile Resource
     def dehydrate(self, bundle):
         self._get_liker_info(bundle)
         self._get_taken_info(bundle)
+        self._get_taken_by_info(bundle)
         return bundle
 
 
