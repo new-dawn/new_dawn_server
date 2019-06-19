@@ -351,7 +351,7 @@ class ProfileResource(ModelResource):
             & Q(action_type=ActionType.ALREADY_TAKEN.value)
         )
         if taken_by.count():
-            bundle.data["taken_by"] = taken_by.first.user_to
+            bundle.data["taken_by"] = taken_by.first().user_to
 
 
     # Add Answer question fields in Profile Resource
