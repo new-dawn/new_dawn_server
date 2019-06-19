@@ -229,8 +229,11 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                 "/api/v1/user_action/", format="json", data=accept_taken_argument
             )
             self.assertEqual(UserAction.objects.filter(action_type=ActionType.ALREADY_TAKEN.value).count(), 2)
-            taken_obj = UserAction.objects.filter(action_type=ActionType.ALREADY_TAKEN.value).first()
-            self.assertEqual(taken_obj.taken_by.user_to.id, 1)
+            res = self.api_client.get(
+                "/api/v1/profile/", format='json', data={"user_id: 1"}
+            )
+            res_data = json.loads(res.content)
+            self.assertEqual(res_data["objects"][1]["taken_by"], 2)
 
     def test_match_user(self):
         with patch(
