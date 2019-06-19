@@ -230,7 +230,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             )
             self.assertEqual(UserAction.objects.filter(action_type=ActionType.ALREADY_TAKEN.value).count(), 2)
             res = self.api_client.get(
-                "/api/v1/profile/", format='json', data={"user_id: 1"}
+                "/api/v1/profile/", format="json", data={"user__id": 1}
             )
             res_data = json.loads(res.content)
             self.assertEqual(res_data["objects"][1]["taken_by"], 2)
