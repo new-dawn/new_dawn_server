@@ -31,6 +31,7 @@ class Profile(models.Model):
     hometown = models.CharField(blank=True, max_length=50, null=True)
     job_title = models.CharField(blank=True, max_length=50, null=True)
     profile_photo_url = models.CharField(blank=True, max_length=50, null=True)
+    review_status = models.IntegerField(blank=True, null=True)
     # school can be expanded further
     school = models.CharField(blank=True, max_length=50, null=True)
     smoke = models.CharField(blank=True, max_length=50, null=True)

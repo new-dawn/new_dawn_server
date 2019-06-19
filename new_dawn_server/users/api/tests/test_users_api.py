@@ -126,6 +126,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
 
         # Extra fields 
         self.assertEqual(res_data['objects'][0]['age'], 29)
+        self.assertEqual(res_data['objects'][0]['review_status'], 0)
 
     def test_user_profile_get_with_filtering(self):
         all_arguments = {
@@ -190,6 +191,53 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         for k, v in res_data_account_arguments.items():
             self.assertEqual(res_data['objects'][0]['account'][k], v)
         self.assertEqual(res_data['objects'][0]['height'], 178)
+
+    def test_user_profile_get_with_review_status(self):
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user1",
+                                       "username": "test-user-1",
+                                       "password": "test-pwd",
+                                       "birthday": "1990-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 173,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user2",
+                                       "username": "test-user-2",
+                                       "password": "test-pwd",
+                                       "birthday": "1995-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 178,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user3",
+                                       "username": "test-user-3",
+                                       "password": "test-pwd",
+                                       "birthday": "1999-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 182,
+                                   })
+        u2 = Profile.objects.get(user__username='test-user-2')
+        u2.review_status = 4
+        u2.save()
+        u3 = Profile.objects.get(user__username='test-user-3')
+        u3.review_status = 1
+        u3.save()
+        res = self.api_client.get(
+          "/api/v1/profile/?review_status__gte=2", format="json")
+        res_data = json.loads(res.content)
+        self.assertEqual(len(res_data['objects']), 1)
+        self.assertEqual(res_data['objects'][0]['review_status'], 4)
+        self.assertEqual(res_data['objects'][0]['user']['username'], 'test-user-2')
 
     def test_user_profile_get_with_age_preference(self):
         res = self.api_client.post("/api/v1/register/", format="json",
