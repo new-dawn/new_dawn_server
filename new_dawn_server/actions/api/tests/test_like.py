@@ -203,6 +203,35 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(res_data["objects"][1]["taken_requested_from_you"], False)
             self.assertEqual(res_data["objects"][1]["taken_requested_from_me"], True)
 
+    def test_taken_user(self):
+        with patch(
+                "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+                return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.taken_argument
+            )
+            accept_taken_argument = {
+                "action_type": ActionType.ACCEPT_TAKEN.value,
+                "entity_id": 0,
+                "user_from": "2",
+                "user_to": "1"
+            }
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=accept_taken_argument
+            )
+            self.assertEqual(UserAction.objects.filter(action_type=ActionType.ALREADY_TAKEN.value).count(), 2)
+            taken_obj = UserAction.objects.filter(action_type=ActionType.ALREADY_TAKEN.value),first()
+            self.assertEqual(taken_obj.taken_by.user_to.id, 1)
+
     def test_match_user(self):
         with patch(
                 "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
