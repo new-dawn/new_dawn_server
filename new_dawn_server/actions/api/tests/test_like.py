@@ -233,7 +233,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
                 "/api/v1/profile/", format="json", data={"user__id": 1}
             )
             res_data = json.loads(res.content)
-            self.assertEqual(res_data["objects"][1]["taken_by"], 2)
+            self.assertEqual(res_data["objects"][0]["taken_by"], 2)
 
     def test_match_user(self):
         with patch(
