@@ -30,6 +30,7 @@ class Profile(models.Model):
     height = models.IntegerField(blank=True, null=True)
     hometown = models.CharField(blank=True, max_length=50, null=True)
     job_title = models.CharField(blank=True, max_length=50, null=True)
+    location = models.CharField(blank=True, max_length=50, null=True)
     profile_photo_url = models.CharField(blank=True, max_length=50, null=True)
     review_status = models.IntegerField(blank=True, null=True)
     # school can be expanded further
