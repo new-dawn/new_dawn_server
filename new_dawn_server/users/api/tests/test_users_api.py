@@ -30,6 +30,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             "employer": "MANMAN",
             "hometown": "NY",
             "job_title": "CEO",
+            "location": "NY",
             "profile_photo_url": "www",
             "school": "NYU",
             "smoke": "Socially",

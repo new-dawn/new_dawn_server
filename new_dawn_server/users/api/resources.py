@@ -68,6 +68,7 @@ PROFILE_FIELDS = {
     "height": False,
     "hometown": False,
     "job_title": False,
+    "location": False,
     "profile_photo_url": False,
     "school": False,
     "smoke": False,
