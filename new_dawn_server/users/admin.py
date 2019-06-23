@@ -11,16 +11,12 @@ class ImageInline(admin.TabularInline):
         return [f.name for f in self.model._meta.fields]
     def has_add_permission(self, request, obj=None):
         return False
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 class AnswerQuestionInline(admin.TabularInline):
     model = AnswerQuestion
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
     def has_add_permission(self, request, obj=None):
-        return False
-    def has_delete_permission(self, request, obj=None):
         return False
 
 class ProfileAdmin(admin.ModelAdmin):
@@ -44,8 +40,6 @@ class ProfileAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields if f.name != 'review_status']
     def has_add_permission(self, request, obj=None):
-        return False
-    def has_delete_permission(self, request, obj=None):
         return False
 
 admin.site.register(Account)
