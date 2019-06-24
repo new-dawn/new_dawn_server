@@ -502,6 +502,7 @@ class UserRegisterResource(ModelResource):
             profile = Profile(
                 user=user_bundle.obj,
                 account=account,
+                age=self._get_age(account.birthday),
                 review_status=review_status,
                 **self._get_model_fields_dict(bundle, PROFILE_FIELDS)
             )
