@@ -7,7 +7,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 # An account model
 class Account(models.Model):
     birthday = models.DateField(blank=True, null=True)
-    city_preference = models.ManyToManyField("locations.CityPreference")
+    city_preference = models.ManyToManyField("locations.CityPreference", blank=True)
     creation_date = models.DateField(auto_now_add=True)
     gender = models.CharField(blank=True, choices=(('M', 'Male'), ('F', 'Female')), max_length=1, null=True)
     name = models.CharField(blank=True, max_length=20, null=True)
