@@ -123,6 +123,7 @@ class UserActionResource(ModelResource):
                 user_from__id__exact=user_to_id,
                 action_type__in=(
                     ActionType.ACCEPT_TAKEN.value,
+                    ActionType.REQUEST_TAKEN.value,
                     ActionType.ALREADY_TAKEN.value
                 )).delete()
             UserAction.objects.filter(
@@ -130,6 +131,7 @@ class UserActionResource(ModelResource):
                 user_to__id__exact=user_to_id,
                 action_type__in=(
                     ActionType.REQUEST_TAKEN.value,
+                    ActionType.ACCEPT_TAKEN.value,
                     ActionType.ALREADY_TAKEN.value
                 )).delete()
 
