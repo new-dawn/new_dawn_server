@@ -244,7 +244,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.api_client.post(
                 "/api/v1/user_action/", format="json", data=untaken_argument
             )
-            self.assertEqual(UserAction.objects.count(), 3)
+            self.assertEqual(UserAction.objects.count(), 1)
             self.assertEqual(UserAction.objects.filter(action_type=ActionType.UNTAKEN.value).count(), 1)
 
     def test_match_user(self):
