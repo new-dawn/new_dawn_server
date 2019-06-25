@@ -15,6 +15,7 @@ class ActionType(Enum):
     UNMATCH = 7
     ACCEPT_TAKEN = 8
     ALREADY_TAKEN = 9
+    UNTAKEN = 10
 
 class EntityType(Enum):
     NONE = 0
