@@ -135,6 +135,16 @@ class UserActionResource(ModelResource):
                     ActionType.ALREADY_TAKEN.value
                 )).delete()
 
+    @staticmethod
+    def recall_taken(user_from_id, user_to_id):
+        with transaction.atomic():
+            UserAction.objects.filter(
+                user_from__id__exact=user_from_id,
+                user_to__id__exact=user_to_id,
+                action_type__in=(
+                    ActionType.REQUEST_TAKEN.value
+                )).delete()
+
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
@@ -161,6 +171,8 @@ class UserActionResource(ModelResource):
             self.delete_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         if bundle.data.get("action_type") == ActionType.UNTAKEN.value:
             self.delete_taken(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
+        if bundle.data.get("action_type") == ActionType.RECALL_TAKEN.value:
+            self.recall_taken(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         return bundle
 
     def prepend_urls(self):
@@ -168,7 +180,8 @@ class UserActionResource(ModelResource):
             url(r"^user_action/send_message/$", self.wrap_view("send_message"), name="api_send_message"),
             url(r"^user_action/get_messages/$", self.wrap_view("get_messages"), name="api_get_messages"),
             url(r"^user_action/unmatch/$", self.wrap_view("unmatch"), name="api_unmatch"),
-            url(r"^user_action/untaken/$", self.wrap_view("untaken"), name="api_untaken")
+            url(r"^user_action/untaken/$", self.wrap_view("untaken"), name="api_untaken"),
+            url(r"^user_action/recall_taken/$", self.wrap_view("recall_taken"), name="api_recall_taken")
         ]
 
     def hydrate_user_from(self, bundle):
