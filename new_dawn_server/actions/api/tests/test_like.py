@@ -247,7 +247,22 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(UserAction.objects.count(), 1)
             self.assertEqual(UserAction.objects.filter(action_type=ActionType.UNTAKEN.value).count(), 1)
 
-            # Recall taken
+    def test_recall_taken(self):
+        with patch(
+                "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
+                return_value=["instance", "key"]
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.send_notification",
+            return_value=None
+        ), patch(
+            "new_dawn_server.pusher.notification_service.NotificationService.beams_auth",
+            return_value={
+                "token": "XXX"
+            }
+        ):
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=self.taken_argument
+            )
             recall_taken_argument = {
                 "action_type": ActionType.RECALL_TAKEN.value,
                 "user_from": "1",
