@@ -139,8 +139,8 @@ class UserActionResource(ModelResource):
     def recall_taken(user_from_id, user_to_id):
         with transaction.atomic():
             UserAction.objects.filter(
-                user_from__id__exact=user_from_id,
-                user_to__id__exact=user_to_id,
+                user_from__id__exact=user_to_id,
+                user_to__id__exact=user_from_id,
                 action_type__in=(
                     ActionType.REQUEST_TAKEN.value,
                 )).delete()
