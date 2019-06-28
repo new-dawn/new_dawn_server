@@ -16,6 +16,7 @@ class ActionType(Enum):
     ACCEPT_TAKEN = 8
     ALREADY_TAKEN = 9
     UNTAKEN = 10
+    RECALL_TAKEN = 11
 
 class EntityType(Enum):
     NONE = 0

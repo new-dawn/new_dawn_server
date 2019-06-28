@@ -247,6 +247,18 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(UserAction.objects.count(), 1)
             self.assertEqual(UserAction.objects.filter(action_type=ActionType.UNTAKEN.value).count(), 1)
 
+            # Recall taken
+            recall_taken_argument = {
+                "action_type": ActionType.RECALL_TAKEN.value,
+                "user_from": "1",
+                "user_to": "2"
+            }
+            self.api_client.post(
+                "/api/v1/user_action/", format="json", data=recall_taken_argument
+            )
+            self.assertEqual(UserAction.objects.count(), 1)
+            self.assertEqual(UserAction.objects.filter(action_type=ActionType.RECALL_TAKEN.value).count(), 1)
+
     def test_match_user(self):
         with patch(
                 "new_dawn_server.pusher.notification_service.NotificationService._get_instance_id_and_secret_key",
