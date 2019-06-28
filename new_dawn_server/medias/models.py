@@ -14,3 +14,6 @@ class Image(models.Model):
 
     class Meta:
     	ordering = ['order']
+
+    def __str__(self):
+    	return "image_of_user_" + str(self.user.id) + "_order_" + str(self.order)
