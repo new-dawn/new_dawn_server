@@ -14,4 +14,4 @@ class UserAction(models.Model):
     update_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-    	return str(self.user_from.id) + "_to_" + str(self.user_from.id) + "_action_" + str(self.action_type)
+    	return str(self.user_from.id) + "_to_" + str(self.user_to.id) + "_action_" + str(self.action_type)
