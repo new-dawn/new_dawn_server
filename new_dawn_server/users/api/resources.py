@@ -157,14 +157,16 @@ class UserResource(ModelResource):
         data = self.deserialize(request, request.body, format=request.META.get("CONTENT_TYPE", "application/json"))
         phone_number = data.get("phone_number", "")
         country_code = data.get("country_code", "")
+        skip = data.get("skip", "")
         via = data.get("via", "sms")
         if phone_number and country_code:
             # Start sending verification code
-            authy_api.phones.verification_start(
-                phone_number=phone_number,
-                country_code=country_code,
-                via=via
-            )
+            if not skip:
+                authy_api.phones.verification_start(
+                    phone_number=phone_number,
+                    country_code=country_code,
+                    via=via
+                )
             return self.create_response(request, ClientResponse(
                 success=True,
                 message="Verification Code Sent",
@@ -182,13 +184,14 @@ class UserResource(ModelResource):
         phone_number = data.get("phone_number", "")
         country_code = data.get("country_code", "")
         verification_code = data.get("verification_code", "")
+        skip = data.get("skip", "")
         if phone_number and country_code:
             verification = authy_api.phones.verification_check(
                 phone_number=phone_number,
                 country_code=country_code,
                 verification_code=verification_code
             )
-            if verification.ok():
+            if skip or verification.ok():
                 exist = False
                 # Phone number by default is used as username
                 user = User.objects.filter(username=phone_number)
