@@ -1,6 +1,7 @@
 from authy.api import AuthyApiClient
 from datetime import date
 import datetime
+import random
 from django import forms
 from django.conf import settings
 from django.conf.urls import url
@@ -276,7 +277,8 @@ class ProfileResource(ModelResource):
             'age': ALL_WITH_RELATIONS,
             'review_status': ALL_WITH_RELATIONS,
         }
-        queryset = Profile.objects.all()
+        profiles_count = Profile.objects.all().count()
+        queryset = Profile.objects.all().order_by('?')[:min(profiles_count,3)]
         resource_name = "profile"
 
 
