@@ -229,7 +229,7 @@ class UserActionResource(ModelResource):
     def build_end_user_metainfo(self, user_obj):
         img = Image.objects.filter(user__id=user_obj.id)
         return {
-            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id).first.media) if len(
+            END_USER_IMAGE_URL: MEDIA_URL + str(img[0].media) if len(
                 img) > 0 else "",
             END_USER_FIRSTNAME: user_obj.first_name,
             END_USER_LASTNAME: user_obj.last_name,
@@ -298,7 +298,7 @@ class UserActionResource(ModelResource):
             }
             for key, value in result.items()
         ]
-        
+
         return sorted(
             pre_order_results, 
             reverse=True,
