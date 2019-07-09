@@ -146,39 +146,42 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         }
         self.message_argument_2 = {
             "user_from": "2",
-            "user_to": "1",
-            "message": "I'm good"
-        }
-        self.message_argument_3 = {
-            "user_from": "2",
             "user_to": "3",
             "message": "Nice to meet you"
         }
+        self.message_argument_3 = {
+            "user_from": "2",
+            "user_to": "1",
+            "message": "I'm good"
+        }
+
+    def create_match(self, user_from_id, user_to_id):
+        UserAction.objects.create(
+            action_type = ActionType.MATCH.value,
+            entity_id = 0,
+            entity_type = EntityType.NONE.value,
+            user_from = User.objects.get(id=user_from_id),
+            user_to = User.objects.get(id=user_to_id)
+        )
+        UserAction.objects.create(
+            action_type = ActionType.MATCH.value,
+            entity_id = 0,
+            entity_type = EntityType.NONE.value,
+            user_from = User.objects.get(id=user_to_id),
+            user_to = User.objects.get(id=user_from_id)
+        )
 
     @patch("new_dawn_server.pusher.chat_service.ChatService.send")
     def test_message_user(self, send):
-        # Create Match
-        UserAction.objects.create(
-            action_type = ActionType.MATCH.value,
-            entity_id = 0,
-            entity_type = EntityType.NONE.value,
-            user_from = User.objects.get(id=1),
-            user_to = User.objects.get(id=2)
-        )
-        UserAction.objects.create(
-            action_type = ActionType.MATCH.value,
-            entity_id = 0,
-            entity_type = EntityType.NONE.value,
-            user_from = User.objects.get(id=3),
-            user_to = User.objects.get(id=2)
-        )
-        UserAction.objects.create(
-            action_type = ActionType.MATCH.value,
-            entity_id = 0,
-            entity_type = EntityType.NONE.value,
-            user_from = User.objects.get(id=2),
-            user_to = User.objects.get(id=4)
-        )
+        # Simulate matches and messages in the following order:
+        # 1 <-- match --> 2
+        # 3 <-- match --> 2
+        # 1 -- message --> 2
+        # 2 -- message --> 3
+        # 2 -- message --> 1
+        # 2 <-- match --> 4
+        self.create_match(1,2)
+        self.create_match(3,2)
         res_1 = self.api_client.post(
             "/api/v1/user_action/send_message/", format="json", data=self.message_argument
         )
@@ -189,6 +192,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
             "/api/v1/user_action/send_message/", format="json", data=self.message_argument_3
         )
         res_all = [res_1, res_2, res_3]
+        self.create_match(2,4)
         for res in res_all:
             res_data = json.loads(res.content)
             # Check post response
@@ -197,7 +201,7 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
 
         # Check creation of objects
         self.assertEqual(User.objects.count(), 4)
-        self.assertEqual(UserAction.objects.count(), 6)
+        self.assertEqual(UserAction.objects.count(), 9)
         # Test all messages sent by user 1
         test_message_object = UserAction.objects.filter(user_from__id=1, action_type=ActionType.MESSAGE.value)
         self.assertEqual(len(test_message_object), 1)
@@ -214,12 +218,13 @@ class UserActionTest(ResourceTestCaseMixin, TestCase):
         )
         res_data = json.loads(res.content)
         # User 2 has matched with 3 people (user 1, 3, 4)
+        # The order of last updates should be 4 (match), 1 (message), 3 (message)
         self.assertEqual(len(res_data["objects"]), 3)
-        self.assertEqual(res_data["objects"][0]["end_user_id"], 1)
-        self.assertEqual(res_data["objects"][1]["end_user_id"], 3)
-        self.assertEqual(res_data["objects"][2]["end_user_id"], 4)
+        self.assertEqual(res_data["objects"][0]["end_user_id"], 4)
+        self.assertEqual(res_data["objects"][1]["end_user_id"], 1)
+        self.assertEqual(res_data["objects"][2]["end_user_id"], 3)
 
-        messages = res_data["objects"][0]["messages"]
+        messages = res_data["objects"][1]["messages"]
         self.assertEqual(messages[0]["user_from_id"], 1)
         self.assertEqual(messages[0]["user_to_id"], 2)
         self.assertEqual(messages[0]["message"], "How are you")

@@ -3,7 +3,14 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from new_dawn_server.actions.constants import (
-    ActionType, EntityType, END_USER_ID, END_USER_FIRSTNAME, END_USER_LASTNAME, END_USER_IMAGE_URL
+    ActionType, 
+    EntityType, 
+    END_USER_ID, 
+    END_USER_FIRSTNAME, 
+    END_USER_LASTNAME, 
+    END_USER_IMAGE_URL,
+    LAST_UPDATE_TIME,
+    MESSAGES,
 )
 from new_dawn_server.actions.models import UserAction
 from new_dawn_server.modules.client_response import ClientResponse
@@ -222,7 +229,7 @@ class UserActionResource(ModelResource):
     def build_end_user_metainfo(self, user_obj):
         img = Image.objects.filter(user__id=user_obj.id)
         return {
-            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id)[0].media) if len(
+            END_USER_IMAGE_URL: MEDIA_URL + str(Image.objects.filter(user__id=user_obj.id).first.media) if len(
                 img) > 0 else "",
             END_USER_FIRSTNAME: user_obj.first_name,
             END_USER_LASTNAME: user_obj.last_name,
@@ -238,6 +245,8 @@ class UserActionResource(ModelResource):
         result = {}
         # Keep track of the basic info of each end user
         end_user_info = {}
+        # Keep track of the last update time
+        last_update_time = {}
         # Bootstrap the message list for each matched end user
         for match_action in matches:
             if str(match_action.user_from.id) != main_actor_id:
@@ -245,11 +254,13 @@ class UserActionResource(ModelResource):
                 if key not in result:
                     result[key] = []
                     end_user_info[key] = self.build_end_user_metainfo(match_action.user_from)
+                    last_update_time[key] = match_action.update_time
             if str(match_action.user_to.id) != main_actor_id:
                 key = match_action.user_to.id
                 if key not in result:
                     result[key] = []
                     end_user_info[key] = self.build_end_user_metainfo(match_action.user_to)
+                    last_update_time[key] = match_action.update_time
 
         # Iterate through the list of messages
         for message_action in messages:
@@ -259,6 +270,7 @@ class UserActionResource(ModelResource):
                 # not matched with each other
                 try:
                     result[key].append(self.build_message_tuple(message_action))
+                    last_update_time[key] = message_action.update_time
                 except KeyError:
                     print(
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_from.id} are not connected")
@@ -269,19 +281,29 @@ class UserActionResource(ModelResource):
                 # not matched with each other
                 try:
                     result[key].append(self.build_message_tuple(message_action))
+                    last_update_time[key] = message_action.update_time
                 except KeyError:
                     print(
                         f"MessageRetrievalError: User {main_actor_id} and user {message_action.user_to.id} are not connected")
-        return [
+        
+        # Results before ordering by update time
+        pre_order_results = [
             {
                 END_USER_ID: end_user_info[key][END_USER_ID],
                 END_USER_FIRSTNAME: end_user_info[key][END_USER_FIRSTNAME],
                 END_USER_LASTNAME: end_user_info[key][END_USER_LASTNAME],
                 END_USER_IMAGE_URL: end_user_info[key][END_USER_IMAGE_URL],
-                "messages": value,
+                MESSAGES: value,
+                LAST_UPDATE_TIME: last_update_time[key]
             }
             for key, value in result.items()
         ]
+        
+        return sorted(
+            pre_order_results, 
+            reverse=True,
+            key=lambda result: result[LAST_UPDATE_TIME]
+        )
 
     def get_messages(self, request, **kwargs):
         # Get messages action fetch all messages that
