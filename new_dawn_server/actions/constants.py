@@ -4,6 +4,8 @@ END_USER_FIRSTNAME = "end_user_first_name"
 END_USER_LASTNAME = "end_user_last_name"
 END_USER_ID = "end_user_id"
 END_USER_IMAGE_URL = "end_user_image_url"
+LAST_UPDATE_TIME = "last_update_time"
+MESSAGES = "messages"
 
 class ActionType(Enum):
     LIKE = 1
