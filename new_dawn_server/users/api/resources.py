@@ -271,7 +271,6 @@ class ProfileResource(ModelResource):
         # TODO: Remove Authentication once profile main page is developed
         authentication = MultiAuthentication(Authentication(), BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
-        limit = 3
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'height': ALL_WITH_RELATIONS,
@@ -282,12 +281,13 @@ class ProfileResource(ModelResource):
         resource_name = "profile"
 
     def apply_filters(self, request, applicable_filters):
+        limit = 3
         ranking = request.GET.get('ranking', False)
         viewer_id = request.GET.get('viewer_id','')
         filtered = super(ProfileResource, self).apply_filters(request, applicable_filters)
-        if viewer_id:
-            filtered = filtered.exclude(id=viewer_id)
         if ranking:
+            if viewer_id:
+                filtered = filtered.exclude(user_id=viewer_id)
             filtered = filtered.order_by('?')
         return filtered
 
