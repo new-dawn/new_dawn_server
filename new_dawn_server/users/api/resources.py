@@ -271,16 +271,25 @@ class ProfileResource(ModelResource):
         # TODO: Remove Authentication once profile main page is developed
         authentication = MultiAuthentication(Authentication(), BasicAuthentication(), ApiKeyAuthentication())
         authorization = Authorization()
+        limit = 3
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'height': ALL_WITH_RELATIONS,
             'age': ALL_WITH_RELATIONS,
             'review_status': ALL_WITH_RELATIONS,
         }
-        profiles_count = Profile.objects.all().count()
-        queryset = Profile.objects.all().order_by('?')[:min(profiles_count,3)]
+        queryset = Profile.objects.all()
         resource_name = "profile"
 
+    def apply_filters(self, request, applicable_filters):
+        ranking = request.GET.get('ranking', False)
+        viewer_id = request.GET.get('viewer_id','')
+        filtered = super(ProfileResource, self).apply_filters(request, applicable_filters)
+        if viewer_id:
+            filtered = filtered.exclude(id=viewer_id)
+        if ranking:
+            filtered = filtered.order_by('?')
+        return filtered
 
     def _build_liker_dict(self, likes):
         if likes.count():
