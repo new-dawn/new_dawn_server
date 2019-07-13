@@ -207,6 +207,7 @@ class UserActionResource(ModelResource):
             user_to=User.objects.get(id=int(user_to)),
             message=message
         )
+        NotificationService().send_notification([str(user_to)], message="You have a new message")
         message_action.save()
         return self.create_response(
             request, ClientResponse(
