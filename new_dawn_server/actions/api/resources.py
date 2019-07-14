@@ -70,7 +70,7 @@ class UserActionResource(ModelResource):
                 entity_type=EntityType.NONE.value
             ).save()
             try:
-                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are matched")
+                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="你有新的匹配")
             except:
                 print("Notification failed for match action")
                 traceback.print_exc()
@@ -116,8 +116,9 @@ class UserActionResource(ModelResource):
                 entity_id=0,
                 entity_type=EntityType.NONE.value
             ).save()
+            user_to_firstname = User.objects.get(id=user_to_id).first_name
             try:
-                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message="You are taken")
+                NotificationService().send_notification([str(user_from_id), str(user_to_id)], message=f"{user_to_firstname} 接受了你的专属邀请")
             except:
                 print("Notification failed for already taken action")
                 traceback.print_exc()
@@ -145,18 +146,13 @@ class UserActionResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         super(UserActionResource, self).obj_create(bundle).obj.save()
         if bundle.data.get("action_type") == ActionType.LIKE.value:
-            try:
-                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are liked")
-            except:
-                print("Notification failed for like action")
-                traceback.print_exc()
             if UserAction.objects.filter(user_to_id=bundle.data.get("user_from_id"),
                                          user_from_id=bundle.data.get("user_to_id"),
                                          action_type=ActionType.LIKE.value).exists():
                 self.create_match(bundle.data.get("user_from_id"), bundle.data.get("user_to_id"))
         if bundle.data.get("action_type") == ActionType.ACCEPT_TAKEN.value:
             try:
-                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="You are requested taken")
+                NotificationService().send_notification([str(bundle.data.get("user_to_id"))], message="收到专属模式邀请")
             except:
                 print("Notification failed for request taken action")
                 traceback.print_exc()
@@ -207,7 +203,7 @@ class UserActionResource(ModelResource):
             user_to=User.objects.get(id=int(user_to)),
             message=message
         )
-        NotificationService().send_notification([str(user_to)], message="You have a new message")
+        NotificationService().send_notification([str(user_to)], message="收到新的信息")
         message_action.save()
         return self.create_response(
             request, ClientResponse(
