@@ -287,6 +287,46 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
             self.assertEqual(res_data['objects'][0]['account'][k], v)
         self.assertEqual(res_data['objects'][0]['age'], 24)
 
+    def test_user_profile_recommendation(self):
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user1",
+                                       "username": "test-user-1",
+                                       "password": "test-pwd",
+                                       "birthday": "1990-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 173,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user2",
+                                       "username": "test-user-2",
+                                       "password": "test-pwd",
+                                       "birthday": "1995-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 178,
+                                   })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user3",
+                                       "username": "test-user-3",
+                                       "password": "test-pwd",
+                                       "birthday": "1999-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "M",
+                                       "height": 182,
+                                   })
+        res = self.api_client.get("/api/v1/profile/?ranking=True&viewer_id=2", format="json")
+        res_data = json.loads(res.content)
+        self.assertEqual(len(res_data['objects']), 2)
+        for res_user in res_data['objects']:
+            self.assertNotEqual(res_user['user']['id'], 2)
+
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
         super().setUp()

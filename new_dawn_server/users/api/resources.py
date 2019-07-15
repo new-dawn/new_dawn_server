@@ -77,6 +77,8 @@ PROFILE_FIELDS = {
 # Account Name Delimiter
 ACCOUNT_NAME_DELIMITER = "_"
 
+MAX_NUM_PROFILES = 3
+
 # Create authentication client
 authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
 
@@ -279,6 +281,15 @@ class ProfileResource(ModelResource):
         queryset = Profile.objects.all()
         resource_name = "profile"
 
+    def apply_filters(self, request, applicable_filters):
+        ranking = request.GET.get('ranking', False)
+        viewer_id = request.GET.get('viewer_id','')
+        filtered = super(ProfileResource, self).apply_filters(request, applicable_filters)
+        if ranking:
+            if viewer_id:
+                filtered = filtered.exclude(user_id=viewer_id)
+            filtered = filtered.order_by('?')[:MAX_NUM_PROFILES]
+        return filtered
 
     def _build_liker_dict(self, likes):
         if likes.count():
