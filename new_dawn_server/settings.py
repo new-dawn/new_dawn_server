@@ -179,3 +179,6 @@ PUSHER_APP_ID=os.environ.get('PUSHER_APP_ID')
 PUSHER_CLUSTER=os.environ.get('PUSHER_CLUSTER')
 BEAMS_INSTANCE_ID = os.environ.get("BEAMS_INSTANCE_ID")
 BEAMS_SECRET_KEY = os.environ.get("BEAMS_SECRET_KEY")
+
+# Application Config Params
+MAX_NUM_PROFILES = os.environ.get('MAX_NUM_PROFILES') or 3

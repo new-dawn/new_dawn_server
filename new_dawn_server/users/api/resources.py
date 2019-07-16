@@ -18,7 +18,7 @@ from new_dawn_server.medias.models import Image
 from new_dawn_server.modules.client_response import ClientResponse
 from new_dawn_server.pusher.notification_service import NotificationService
 from new_dawn_server.questions.models import AnswerQuestion, Question
-from new_dawn_server.settings import MEDIA_URL
+from new_dawn_server.settings import MAX_NUM_PROFILES, MEDIA_URL
 from new_dawn_server.users.constants import UserReviewStatus
 from new_dawn_server.users.models import Account
 from new_dawn_server.users.models import Profile
@@ -76,8 +76,6 @@ PROFILE_FIELDS = {
 
 # Account Name Delimiter
 ACCOUNT_NAME_DELIMITER = "_"
-
-MAX_NUM_PROFILES = 3
 
 # Create authentication client
 authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
