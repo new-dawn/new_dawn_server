@@ -286,7 +286,7 @@ class ProfileResource(ModelResource):
         if ranking:
             if viewer_id:
                 filtered = filtered.exclude(user_id=viewer_id)
-            filtered = filtered.order_by('?')[:MAX_NUM_PROFILES]
+            filtered = filtered.order_by('?')[:int(MAX_NUM_PROFILES)]
         return filtered
 
     def _build_liker_dict(self, likes):
