@@ -321,11 +321,23 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
                                        "gender": "M",
                                        "height": 182,
                                    })
+        res = self.api_client.post("/api/v1/register/", format="json",
+                                   data={
+                                       "first_name": "test",
+                                       "last_name": "user4",
+                                       "username": "test-user-4",
+                                       "password": "test-pwd",
+                                       "birthday": "1994-01-01",
+                                       "phone_number": "+12345678900",
+                                       "gender": "F",
+                                       "height": 169,
+                                   })
         res = self.api_client.get("/api/v1/profile/?ranking=True&viewer_id=2", format="json")
         res_data = json.loads(res.content)
         self.assertEqual(len(res_data['objects']), 2)
         for res_user in res_data['objects']:
             self.assertNotEqual(res_user['user']['id'], 2)
+        self.assertEqual(res_data['objects'][0]['gender'], 'F')
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
