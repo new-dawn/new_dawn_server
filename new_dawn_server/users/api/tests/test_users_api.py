@@ -334,7 +334,7 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
                                    })
         res = self.api_client.get("/api/v1/profile/?ranking=True&viewer_id=2", format="json")
         res_data = json.loads(res.content)
-        self.assertEqual(len(res_data['objects']), 2)
+        self.assertEqual(len(res_data['objects']), 1)
         for res_user in res_data['objects']:
             self.assertNotEqual(res_user['user']['id'], 2)
         self.assertEqual(res_data['objects'][0]['gender'], 'F')
