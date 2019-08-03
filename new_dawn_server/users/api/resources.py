@@ -286,8 +286,9 @@ class ProfileResource(ModelResource):
         if ranking:
             if viewer_id:
                 filtered = filtered.exclude(user_id=viewer_id)
-                profile = Profile.objects.get(user__id=viewer_id)
-                filtered = filtered.exclude(gender=profile.gender)
+                account = Account.objects.get(user__id=viewer_id)
+                gender = account.gender
+                filtered = filtered.exclude(account__gender=gender)
             filtered = filtered.order_by('?')[:int(MAX_NUM_PROFILES)]
         return filtered
 
