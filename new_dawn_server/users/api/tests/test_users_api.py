@@ -337,7 +337,6 @@ class UserRegisterTest(ResourceTestCaseMixin, TestCase):
         self.assertEqual(len(res_data['objects']), 1)
         for res_user in res_data['objects']:
             self.assertNotEqual(res_user['user']['id'], 2)
-        self.assertEqual(res_data['objects'][0]['user']['gender'], 'F')
 
 class ProfileQuestionTest(ResourceTestCaseMixin, TestCase):
     def setUp(self):
